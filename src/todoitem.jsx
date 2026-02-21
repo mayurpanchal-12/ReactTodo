@@ -222,11 +222,11 @@ export default function TodoItem({ todo }) {
           className="cursor-pointer"
         />
 
-        <span className="text-lg" title={`Priority: ${priority}`}>
+        <span className="text-lg" title={`Priority: ${(todo.priority || "mid").charAt(0).toUpperCase() + (todo.priority || "mid").slice(1)}`}>
           {priorityIcons[todo.priority || "mid"]}
         </span>
 
-        <span className="text-lg" title={`Category: ${todo.category || "other"}`}>
+        <span className="text-lg" title={`Category: ${(todo.category || "other").charAt(0).toUpperCase() + (todo.category || "other").slice(1)}`}>
           {categoryIcons[todo.category || "other"]}
         </span>
 
@@ -317,41 +317,47 @@ export default function TodoItem({ todo }) {
           </div>
           <div className="flex gap-1 flex-wrap">
             {(["low", "mid", "high"]).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPriority(p)}
-                className={`px-2 py-1 rounded text-sm transition-all ${
-                  priority === p
-                    ? "bg-blue-600 text-white scale-110"
-                    : isDark
-                      ? "bg-white/20 hover:bg-white/30 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
-                title={`Priority: ${p}`}
-              >
-                {priorityIcons[p]} {p}
-              </button>
+              <div key={p} className="relative group flex">
+                <button
+                  type="button"
+                  onClick={() => setPriority(p)}
+                  className={`px-2 py-1 rounded text-sm transition-all ${
+                    priority === p
+                      ? "bg-blue-600 text-white scale-110"
+                      : isDark
+                        ? "bg-white/20 hover:bg-white/30 text-white"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {priorityIcons[p]} {p}
+                </button>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 bg-gray-800 text-white dark:bg-gray-700">
+                  Priority: {p.charAt(0).toUpperCase() + p.slice(1)}
+                </div>
+              </div>
             ))}
           </div>
           <div className="flex gap-1 flex-wrap">
             {(["finance", "study", "work", "other"]).map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setCategory(cat)}
-                className={`px-2 py-1 rounded text-sm transition-all flex items-center gap-1 ${
-                  category === cat
-                    ? "bg-purple-600 text-white scale-110"
-                    : isDark
-                      ? "bg-white/20 hover:bg-white/30 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
-                title={`Category: ${cat}`}
-              >
-                <span>{categoryIcons[cat]}</span>
-                <span className="capitalize">{cat}</span>
-              </button>
+              <div key={cat} className="relative group flex">
+                <button
+                  type="button"
+                  onClick={() => setCategory(cat)}
+                  className={`px-2 py-1 rounded text-sm transition-all flex items-center gap-1 ${
+                    category === cat
+                      ? "bg-purple-600 text-white scale-110"
+                      : isDark
+                        ? "bg-white/20 hover:bg-white/30 text-white"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  <span>{categoryIcons[cat]}</span>
+                  <span className="capitalize">{cat}</span>
+                </button>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 bg-gray-800 text-white dark:bg-gray-700">
+                  Category: {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </div>
+              </div>
             ))}
           </div>
 

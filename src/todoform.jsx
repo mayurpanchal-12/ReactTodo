@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTodo } from "./todocontext";
 
 export default function TodoForm() {
@@ -202,39 +202,47 @@ export default function TodoForm() {
 
         <div className={`flex rounded-lg p-1 gap-1 ${isDark ? "bg-white/20" : "bg-gray-100"}`}>
           {["low", "mid", "high"].map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setPriority(p)}
-              className={`px-3 py-1.5 rounded-md ${
-                priority === p
-                  ? "bg-blue-600 text-white"
-                  : isDark
-                  ? "text-gray-200"
-                  : "text-gray-700"
-              }`}
-            >
-              {priorityIcons[p]}
-            </button>
+            <div key={p} className="relative group flex items-center">
+              <button
+                type="button"
+                onClick={() => setPriority(p)}
+                className={`px-3 py-1.5 rounded-md ${
+                  priority === p
+                    ? "bg-blue-600 text-white"
+                    : isDark
+                    ? "text-gray-200"
+                    : "text-gray-700"
+                }`}
+              >
+                {priorityIcons[p]}
+              </button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 bg-gray-800 text-white dark:bg-gray-700">
+                Priority: {p.charAt(0).toUpperCase() + p.slice(1)}
+              </div>
+            </div>
           ))}
         </div>
 
         <div className={`flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-white/20" : "bg-gray-100"}`}>
           {["finance", "study", "work", "other"].map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setCategory(cat)}
-              className={`px-3 py-1.5 rounded-md ${
-                category === cat
-                  ? "bg-purple-600 text-white"
-                  : isDark
-                  ? "text-gray-200"
-                  : "text-gray-700"
-              }`}
-            >
-              {categoryIcons[cat]}
-            </button>
+            <div key={cat} className="relative group flex items-center">
+              <button
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={`px-3 py-1.5 rounded-md ${
+                  category === cat
+                    ? "bg-purple-600 text-white"
+                    : isDark
+                    ? "text-gray-200"
+                    : "text-gray-700"
+                }`}
+              >
+                {categoryIcons[cat]}
+              </button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10 bg-gray-800 text-white dark:bg-gray-700">
+                Category: {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </div>
+            </div>
           ))}
         </div>
 
