@@ -144,7 +144,7 @@ export default function TodoForm() {
             onChange={(e) => setText(e.target.value)}
             placeholder="Write Todo..."
             required
-            className={`w-full pl-3 pr-10 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full pl-3 pr-12 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 ${
               isDark
                 ? "bg-white/90 text-gray-800 border-gray-300"
                 : "bg-white text-gray-800 border-gray-300"
@@ -153,9 +153,24 @@ export default function TodoForm() {
           <button
             type="button"
             onClick={isListening ? stopListening : startListening}
-            className="absolute right-2 top-1/2 -translate-y-1/2"
+            title={isListening ? "Stop listening" : "Start voice input"}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 flex items-center justify-center z-10 ${
+              isListening
+                ? "bg-red-500 text-white animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+                : "text-gray-500 hover:text-blue-600 hover:bg-black/5"
+            }`}
           >
-            {isListening ? "🎤" : "🎙️"}
+            {isListening ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+            )}
           </button>
         </div>
 
