@@ -29,7 +29,8 @@ An interactive **Todo app** built with **React** and **Context API**, featuring 
 - **Clear Completed** – Remove all completed todos with a single click.  
 - **Counts & Quick Filters** – Buttons for **Total**, **Active**, **Completed**, **Overdue**, and **Category** show counts and filter todos on click.  
 - **Export Options** – Download todos as **PDF** or **CSV**.  
-- **Search Functionality** – Quickly search todos by text.  
+- **Search Functionality** – Quickly search todos by text.
+- **voice to text** - add todo quickly
 - **Interactive & User-Friendly UI** – Clean, responsive, and visually appealing interface.
 
 ---
