@@ -1,5 +1,6 @@
 
 import TodoDownloadDropdown from "./download.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import FilterBar from "./filter.jsx";
 import { TodoProvider, useTodo } from "./todocontext.jsx";
 import TodoForm from "./todoform.jsx";
@@ -337,7 +338,9 @@ function TodoList() {
 export default function App() {
   return (
     <TodoProvider>
+      <ErrorBoundary>
       <TodoList />
+      </ErrorBoundary>
     </TodoProvider>
   );
 }
