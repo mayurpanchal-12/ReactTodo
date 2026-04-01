@@ -1,0 +1,163 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-display: "Syne", sans-serif;
+  --font-body:    "DM Sans", sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+
+  /* Light palette */
+  --bg-base:       #f0ede8;
+  --bg-surface:    #faf9f7;
+  --bg-surface-2:  #f2efe9;
+  --bg-surface-3:  #e8e4dc;
+  --bg-overlay:    rgba(250,249,247,0.96);
+  --border:        #ddd9d0;
+  --border-subtle: #e8e4dc;
+
+  --text-primary:   #1a1814;
+  --text-secondary: #5c5850;
+  --text-muted:     #9c9890;
+
+  --accent:       #e8621a;
+  --accent-hover: #d4540e;
+  --accent-soft:  rgba(232,98,26,0.09);
+  --accent-glow:  rgba(232,98,26,0.2);
+
+  --indigo:       #4f46e5;
+  --indigo-soft:  rgba(79,70,229,0.1);
+  --green:        #16a34a;
+  --green-soft:   rgba(22,163,74,0.1);
+  --red:          #dc2626;
+  --red-soft:     rgba(220,38,38,0.1);
+  --amber:        #d97706;
+  --amber-soft:   rgba(217,119,6,0.1);
+  --teal:         #0d9488;
+  --teal-soft:    rgba(13,148,136,0.1);
+  --purple:       #7c3aed;
+  --purple-soft:  rgba(124,58,237,0.1);
+
+  --shadow-xs:     0 1px 3px rgba(0,0,0,0.05);
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md:     0 4px 20px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-lg:     0 12px 48px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-accent: 0 4px 24px rgba(232,98,26,0.3);
+
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+
+  --sidebar-w: 260px;
+  --topbar-h: 64px;
+
+  /* UX: Consistent transition system */
+  --transition-fast:   0.12s ease;
+  --transition-base:   0.18s ease;
+  --transition-slow:   0.28s cubic-bezier(0.4,0,0.2,1);
+
+  /* UX: Focus ring for keyboard accessibility (WCAG 2.4.7) */
+  --focus-ring: 0 0 0 3px var(--accent-soft), 0 0 0 1.5px var(--accent);
+
+  /* UX: Typography scale */
+  --lh-tight:  1.25;
+  --lh-base:   1.5;
+  --lh-loose:  1.75;
+  --ls-tight:  -0.025em;
+  --ls-wide:    0.04em;
+  --ls-widest:  0.12em;
+}
+
+.dark {
+  --bg-base:       #0f0e0c;
+  --bg-surface:    #171614;
+  --bg-surface-2:  #1e1c1a;
+  --bg-surface-3:  #262420;
+  --bg-overlay:    rgba(23,22,20,0.97);
+  --border:        #2c2926;
+  --border-subtle: #221f1c;
+
+  --text-primary:   #f2ede6;
+  --text-secondary: #8a857d;
+  --text-muted:     #4a4742;
+
+  --accent:       #f07030;
+  --accent-hover: #f28040;
+  --accent-soft:  rgba(240,112,48,0.12);
+  --accent-glow:  rgba(240,112,48,0.22);
+
+  --indigo:       #6366f1;
+  --indigo-soft:  rgba(99,102,241,0.12);
+  --green:        #22c55e;
+  --green-soft:   rgba(34,197,94,0.12);
+  --red:          #f87171;
+  --red-soft:     rgba(248,113,113,0.12);
+  --amber:        #fbbf24;
+  --amber-soft:   rgba(251,191,36,0.12);
+  --teal:         #2dd4bf;
+  --teal-soft:    rgba(45,212,191,0.12);
+  --purple:       #a78bfa;
+  --purple-soft:  rgba(167,139,250,0.12);
+
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:     0 4px 20px rgba(0,0,0,0.35);
+  --shadow-lg:     0 12px 48px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-accent: 0 4px 24px rgba(240,112,48,0.28);
+
+  --focus-ring: 0 0 0 3px var(--accent-soft), 0 0 0 1.5px var(--accent);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100dvh;
+  font-size: 0.9rem;
+  line-height: var(--lh-base);
+}
+
+/* UX: Text selection styling */
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* UX: CRITICAL - Keyboard focus ring (WCAG 2.4.7 — Focus Visible) */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring) !important;
+  border-radius: var(--radius-sm);
+}
+
+/* UX: Thin elegant scrollbars */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-pill);
+  transition: background var(--transition-fast);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* UX: Respect reduced motion preference (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

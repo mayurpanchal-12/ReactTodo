@@ -1,0 +1,583 @@
+
+.todo-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.875rem;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base),
+              transform var(--transition-base), opacity var(--transition-base);
+  box-shadow: var(--shadow-xs);
+  position: relative;
+  overflow: hidden;
+}
+
+.todo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: 2px 0 0 2px;
+  transition: background var(--transition-base);
+}
+
+.todo-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.todo-card:hover::before { background: var(--accent); }
+
+.todo-card.state-completed {
+  opacity: 0.5;
+  background: var(--bg-surface-2);
+}
+.todo-card.state-completed:hover    { opacity: 0.7; }
+.todo-card.state-completed::before  { background: var(--green); }
+
+.todo-card.state-overdue            { border-color: var(--red-soft); }
+.todo-card.state-overdue::before    { background: var(--red); }
+
+.todo-card.state-pinned             { border-color: var(--amber-soft); }
+.todo-card.state-pinned::before     { background: var(--amber); }
+
+
+.card-pin-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.35rem;
+  opacity: 0.9;
+}
+
+
+.card-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.todo-checkbox {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  border-radius: 4px;
+  transition: transform var(--transition-fast);
+}
+.todo-checkbox:checked { animation: checkBounce 0.3s ease; }
+
+.todo-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.todo-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.todo-badges {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  font-size: 0.7rem;
+  width: 18px;
+  height: 18px;
+}
+
+.task-project-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 99px;
+  border: 1px solid;
+  font-size: 0.63rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* task title */
+.todo-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.45;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.todo-text.completed {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+  color: var(--text-muted);
+}
+
+.search-mark {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* inline edit input */
+.todo-edit-input {
+  width: 100%;
+  border: 1px solid var(--accent);
+  outline: none;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  transition: box-shadow var(--transition-fast);
+  font-family: var(--font-body);
+}
+.todo-edit-input:focus { box-shadow: 0 0 0 3px var(--accent-soft); }
+
+/* ─── Card Actions ───────────────────────────────────────────────────────── */
+
+/* actions column — flush right, hidden until hover */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  /* small vertical padding so it doesn't stretch the row */
+  padding-top: 0.1rem;
+}
+
+.todo-card:hover .card-actions,
+.todo-card:focus-within .card-actions { opacity: 1; }
+
+/* thin divider between groups of buttons */
+.card-actions-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  margin: 0 3px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.card-btn:hover             { background: var(--bg-surface-2); color: var(--text-primary); }
+.card-btn.edit-active       { background: var(--accent-soft);  color: var(--accent); }
+.card-btn.pin-active        { background: var(--amber-soft);   color: var(--amber); }
+.card-btn.delete-btn:hover  { background: var(--red-soft);     color: var(--red); }
+.card-btn:disabled          { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+/* subtask progress count in actions area */
+.subtask-progress-badge {
+  font-size: 0.6rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  background: var(--bg-surface-3);
+  color: var(--text-muted);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* ─── Edit Section ───────────────────────────────────────────────────────── */
+
+.card-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border-subtle);
+  animation: slideDown 0.15s ease;
+}
+
+/* row of date/time/repeat fields */
+.card-edit-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* labeled field wrapper */
+.card-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.card-edit-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* priority + category in one horizontal block */
+.card-edit-groups {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-edit-group-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-edit-input {
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 32px;
+}
+.card-edit-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.card-ctrl-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.card-ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 28px;
+}
+.card-ctrl-btn:hover      { background: var(--bg-surface-3); color: var(--text-primary); }
+.card-ctrl-btn.active-p   { background: var(--accent-soft);  color: var(--accent);  font-weight: 600; }
+.card-ctrl-btn.active-c   { background: var(--purple-soft);  color: var(--purple);  font-weight: 600; }
+
+/* ─── Subtasks (edit) ────────────────────────────────────────────────────── */
+
+.card-subtasks-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.subtask-add-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.subtask-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ─── Subtasks (view) ────────────────────────────────────────────────────── */
+
+.card-subtasks-view {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.275rem;
+}
+
+.subtask-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.subtask-progress-bar {
+  height: 2px;
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-pill);
+  margin-top: 0.375rem;
+  overflow: hidden;
+}
+.subtask-progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease;
+}
+
+/* ─── Markdown editor / viewer ───────────────────────────────────────────── */
+
+.md-editor {
+  width: 100%;
+  min-height: 72px;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+.md-editor:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.md-viewer {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.81rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.md-viewer p               { margin-bottom: 0.2rem; }
+.md-viewer strong          { color: var(--text-primary); font-weight: 700; }
+.md-viewer em              { font-style: italic; }
+.md-viewer code {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  background: var(--bg-surface-3);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* ─── Footer row (due date + tags together) ──────────────────────────────── */
+
+.card-footer-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+/* ─── Due date ───────────────────────────────────────────────────────────── */
+
+.card-due {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.card-due-overdue { color: var(--red); font-weight: 600; }
+
+.overdue-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--red-soft);
+  color: var(--red);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-pill);
+  animation: fadeIn 0.2s ease;
+}
+
+/* ─── Tags ───────────────────────────────────────────────────────────────── */
+
+.card-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.63rem;
+  font-weight: 600;
+  background: var(--indigo-soft);
+  color: var(--indigo);
+  border: 1px solid rgba(79, 70, 229, 0.18);
+  cursor: default;
+}
+.card-tag.editable { padding-right: 0.15rem; }
+
+.tag-remove-btn {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--indigo);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  opacity: 0.65;
+  line-height: 1;
+  padding: 0;
+}
+.tag-remove-btn:hover { background: var(--red-soft); color: var(--red); opacity: 1; }
+
+.card-tags-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  animation: slideDown 0.15s ease;
+}
+.card-tags-list      { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; }
+.card-tags-input-row { display: flex; gap: 0.375rem; }
+
+.card-tag-input {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-family: var(--font-body);
+}
+.card-tag-input:focus {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 2px var(--indigo-soft);
+}
+
+.card-tag-add-btn {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.card-tag-add-btn:hover { filter: brightness(1.1); }
+
+/* ─── Attachments (view) ─────────────────────────────────────────────────── */
+
+/*
+  Thumbnails are constrained to a sensible size so a photo
+  doesn't blow up the card. Images show at 56×56px — enough
+  to recognise, not enough to dominate.
+*/
+.attachment-view-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.attachment-view-item {
+  position: relative;
+  overflow: hidden;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+.attachment-view-item:hover {
+  border-color: var(--accent);
+  transform: scale(1.04);
+}
+.attachment-view-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.attachment-file-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+  padding: 0.3rem;
+}
+.attachment-file-view-name {
+  font-size: 0.48rem;
+  color: var(--text-secondary);
+  text-align: center;
+  word-break: break-all;
+  line-height: 1.2;
+}

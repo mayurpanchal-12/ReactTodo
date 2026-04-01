@@ -1,336 +1,438 @@
-
+import { useState, useRef, useEffect } from "react";
 import TodoDownloadDropdown from "./download.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import FilterBar from "./filter.jsx";
 import { TodoProvider, useTodo } from "./todocontext.jsx";
 import TodoForm from "./todoform.jsx";
 import TodoItem from "./todoitem.jsx";
-import { useState , useRef, useEffect} from "react";
+import Dashboard from "./dashboard.jsx";
+import CalendarView from "./calendar.jsx";
+import BoardView from "./board.jsx";
+import PomodoroTimer from "./pomodoro.jsx";
+import HistoryView from "./history.jsx";
+import ProjectsPanel from "./projects.jsx";
+
+import TodayFocusBtn from "./todayfocus.jsx";
+import PinnedPanel from "./pinned.jsx";
+import TagsPanel from "./tagspanel.jsx";
+
 function TodoList() {
   const {
-    groupedTodos,
-    activeCount,
-    completedCount,
-    overdueCount,
-    totalCount,
-    filter,
-    setFilter,
-    theme,
-    setTheme,
-    categoryFilter,
-    setCategoryFilter,
-    clearCompleted,
+    groupedTodos, activeCount, completedCount, overdueCount, totalCount,
+    filter, setFilter, theme, setTheme, categoryFilter, setCategoryFilter,
+    clearCompleted, projects, activeProject, setActiveProject,todayFocus, activeTag, 
   } = useTodo();
 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showDashboard, setShowDashboard]               = useState(false);
+  const [viewMode, setViewMode]                         = useState("list");
+  const [sidebarOpen, setSidebarOpen]                   = useState(false);
   const categoryDropdownRef = useRef(null);
 
-  const categoryIcons = {
-    finance: "💰",
-    study: "📚",
-    work: "💼",
-    other: "📝",
-  };
+  const categoryIcons  = { finance: "💰", study: "📚", work: "💼", other: "📝" };
+  const categoryLabels = { finance: "Finance", study: "Study", work: "Work", other: "Other" };
 
-  const categoryColors = {
-    finance: "from-green-500 to-emerald-500",
-    study: "from-blue-500 to-indigo-500",
-    work: "from-purple-500 to-pink-500",
-    other: "from-gray-500 to-slate-500",
-  };
+  const isDark = theme === "dark";
 
-  // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
-        setShowCategoryDropdown(false);
-      }
-    }
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
 
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target))
+        setShowCategoryDropdown(false);
+    }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleCategorySelect = (category) => {
-    if (categoryFilter === category) {
-      setCategoryFilter(null); // Toggle off if same category
-    } else {
-      setCategoryFilter(category);
-      setFilter("all"); // Reset status filter to "all"
-    }
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") setSidebarOpen(false); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, []);
+
+  const handleCategorySelect = (cat) => {
+    setCategoryFilter(categoryFilter === cat ? null : cat);
+    setFilter("all");
     setShowCategoryDropdown(false);
   };
 
-  const handleStatusFilter = (statusFilter) => {
-    setFilter(statusFilter);
-    if (statusFilter !== "all") setCategoryFilter(null); // Clear category filter except 'all'
+  const handleStatusFilter = (f) => {
+    setFilter(f);
+    if (f !== "all") setCategoryFilter(null);
   };
 
-  const formatDateHeader = (dateString) => {
-    if (dateString === "no-date") return "No Date";
-
-    const date = new Date(dateString);
-    const today = new Date();
-    const tomorrow = new Date(today);
+  const formatDateHeader = (ds) => {
+    if (ds === "no-date") return "No Due Date";
+    const date = new Date(ds);
+    const today = new Date(), tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return `Today - ${date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })}`;
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return `Tomorrow - ${date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })}`;
-    }
-
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    if (date.toDateString() === today.toDateString())
+      return `Today · ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+    if (date.toDateString() === tomorrow.toDateString())
+      return `Tomorrow · ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+    return date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" });
   };
 
-  const isDark = theme === "dark";
+  const getGroupClass = (ds) => {
+    if (ds === "no-date") return "todo-group";
+    const date = new Date(ds);
+    if (date.toDateString() === new Date().toDateString()) return "todo-group group-today";
+    if (date < new Date()) return "todo-group group-overdue";
+    return "todo-group";
+  };
+
+  const completionRate = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+
+  // Page title
+  const activeProjectObj = projects.find(p => p.id === activeProject);
+  // const pageTitle = activeProjectObj
+  //   ? activeProjectObj.name
+  //   : categoryFilter
+  //     ? `${categoryIcons[categoryFilter]} ${categoryLabels[categoryFilter]}`
+  //     : { list: "All Tasks", board: "Board", calendar: "Calendar", history: "History" }[viewMode] || "All Tasks";
+
+
+  const pageTitle = todayFocus
+  ? "📅 Today's Focus"
+  : activeTag
+    ? `🏷️ #${activeTag}`
+    : activeProjectObj
+      ? activeProjectObj.name
+      : categoryFilter
+        ? `${categoryIcons[categoryFilter]} ${categoryLabels[categoryFilter]}`
+        : { list: "All Tasks", board: "Board", calendar: "Calendar", history: "History" }[viewMode] || "All Tasks";
+
+  useEffect(() => {
+    document.title = `${pageTitle} | TaskFlow`;
+  }, [pageTitle]);
 
   return (
-    <div
-      className={`min-h-screen py-10 transition-colors duration-300 ${
-        isDark
-          ? "bg-gradient-to-br from-[#0f172a] via-[#172842] to-[#1e293b]"
-          : "bg-gradient-to-br from-gray-50 via-white to-blue-50"
-      }`}
-    >
+    <div className="app-bg">
+      {/* UX: Skip navigation link — keyboard users can jump to content (WCAG 2.4.1) */}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
+      {/* ── Sidebar Overlay ── */}
       <div
-        className={`w-full max-w-4xl mx-auto shadow-2xl rounded-2xl px-6 py-6 backdrop-blur-lg border transition-colors duration-300 ${
-          isDark ? "text-white bg-white/5 border-white/10" : "text-gray-800 bg-white/80 border-gray-200"
-        }`}
+        className={`sidebar-overlay ${sidebarOpen ? "visible" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* ── Sidebar ── */}
+      <aside
+        className={`app-sidebar ${sidebarOpen ? "open" : ""}`}
+        aria-label="Navigation sidebar"
+        aria-hidden={!sidebarOpen}
+        role="navigation"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1
-            className={`text-3xl font-extrabold text-center flex-1 tracking-wide bg-gradient-to-r bg-clip-text text-transparent ${
-              isDark ? "from-blue-400 to-purple-400" : "from-blue-600 to-purple-600"
-            }`}
-          >
-            Manage Your Todos
-          </h1>
+        <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>×</button>
 
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={`p-3 rounded-full transition-all duration-300 transform hover:scale-110 ${
-              isDark
-                ? "bg-yellow-400/20 hover:bg-yellow-400/30 text-yellow-400"
-                : "bg-gray-800/20 hover:bg-gray-800/30 text-gray-800"
-            }`}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <span className="text-2xl">☀️</span> : <span className="text-2xl">🌙</span>}
+<div className="sidebar-logo">
+  <div className="sidebar-logo-icon">✓</div>
+  Task<span>Flow</span>
+</div>
+
+{/* Quick Add */}
+<button
+  className="sidebar-quick-add"
+  onClick={() => {
+    setViewMode("list");
+    setActiveProject(null);
+    setSidebarOpen(false);
+    setTimeout(() => document.querySelector(".form-input-text")?.focus(), 150);
+  }}
+>
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+  New Task
+</button>
+
+{/* Today's Focus */}
+<div className="sidebar-section-label">Focus</div>
+<TodayFocusBtn onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+
+{/* Pinned Tasks */}
+<div className="sidebar-section-label">Pinned</div>
+<PinnedPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+
+{/* Tags */}
+<div className="sidebar-section-label">Tags</div>
+<TagsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+
+<div className="sidebar-divider" />
+
+{/* Projects */}
+<div className="sidebar-section-label">Projects</div>
+<ProjectsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+
+<div className="sidebar-divider" />
+
+{/* Bottom nav */}
+<nav className="sidebar-nav">
+  <button className="sidebar-nav-item" onClick={() => { setShowDashboard(true); setSidebarOpen(false); }}>
+    <span className="nav-icon">📊</span>
+    Analytics
+  </button>
+  <button
+    className={`sidebar-nav-item ${viewMode === "history" ? "active" : ""}`}
+    onClick={() => { setViewMode("history"); setSidebarOpen(false); }}
+  >
+    <span className="nav-icon">🕐</span>
+    Activity History
+  </button>
+</nav>
+
+<div className="sidebar-footer">
+  <span className="sidebar-footer-label">Theme</span>
+  <button className="theme-btn" onClick={() => setTheme(isDark ? "light" : "dark")}>
+    {isDark ? (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    ) : (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    )}
+  </button>
+</div>
+      </aside>
+
+      {/* ── Main Content ── */}
+      <main className="app-main" id="main-content">
+
+        {/* ── Top Bar ── */}
+        <header className="topbar" role="banner">
+          <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen(true)} aria-label="Open navigation sidebar" aria-expanded={sidebarOpen} aria-controls="app-sidebar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
           </button>
-        </div>
 
-        <TodoForm />
+          <div className="topbar-logo">
+            <div className="topbar-logo-dot" />
+            TaskFlow
+          </div>
 
-        {/* Status Buttons */}
-        <div
-          className={`text-sm mt-4 flex flex-wrap gap-4 justify-center rounded-lg py-3 px-4 border transition-colors duration-300 ${
-            isDark ? "bg-white/5 border-white/10" : "bg-gray-100/50 border-gray-200"
-          }`}
-        >
-          <button
-            onClick={() => handleStatusFilter("all")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-              filter === "all" && !categoryFilter
-                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/50"
-                : isDark
-                ? "bg-white/10 text-white hover:bg-white/20"
-                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-            }`}
-          >
-            <span className="block text-xs opacity-80 mb-1">Total</span>
-            <span className="text-lg font-bold">{totalCount}</span>
-          </button>
-
-          <button
-            onClick={() => handleStatusFilter("active")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-              filter === "active" && !categoryFilter
-                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/50"
-                : isDark
-                ? "bg-white/10 text-white hover:bg-white/20"
-                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-            }`}
-          >
-            <span className="block text-xs opacity-80 mb-1">Active</span>
-            <span className="text-lg font-bold">{activeCount}</span>
-          </button>
-
-          <button
-            onClick={() => handleStatusFilter("completed")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-              filter === "completed" && !categoryFilter
-                ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg shadow-yellow-500/50"
-                : isDark
-                ? "bg-white/10 text-white hover:bg-white/20"
-                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-            }`}
-          >
-            <span className="block text-xs opacity-80 mb-1">Completed</span>
-            <span className="text-lg font-bold">{completedCount}</span>
-          </button>
-
-          <button
-            onClick={() => handleStatusFilter("overdue")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-              filter === "overdue" && !categoryFilter
-                ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/50"
-                : isDark
-                ? "bg-white/10 text-red-400 hover:bg-white/20"
-                : "bg-white text-red-600 hover:bg-gray-50 border border-gray-200"
-            }`}
-          >
-            <span className="block text-xs opacity-80 mb-1">Overdue</span>
-            <span className="text-lg font-bold">{overdueCount}</span>
-          </button>
-
-          {/* Category & Clear Completed */}
-          <div className="flex gap-4 items-center">
-            <div className="relative" ref={categoryDropdownRef}>
-              <button
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                  categoryFilter
-                    ? `bg-gradient-to-r ${categoryColors[categoryFilter]} text-white shadow-lg`
-                    : isDark
-                    ? "bg-white/10 text-white hover:bg-white/20"
-                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-                }`}
-              >
-                <span className="block text-xs opacity-80 mb-1">
-                  {categoryFilter ? (
-                    <span className="flex items-center gap-1 justify-center">
-                      <span>{categoryIcons[categoryFilter]}</span>
-                      <span className="capitalize">{categoryFilter}</span>
-                    </span>
-                  ) : (
-                    "Category"
-                  )}
-                </span>
-                <span className="text-lg font-bold">🏷️</span>
-              </button>
-
-              {showCategoryDropdown && (
-                <div
-                  className={`absolute right-0 mt-1 z-50 rounded-md shadow-lg border ${
-                    isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-                  }`}
-                  style={{ minWidth: "150px" }}
+          {/* Page title + active project badge */}
+          <div className="topbar-title">
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              {activeProjectObj && (
+                <span
+                  className="topbar-project-badge"
+                  style={{ background: activeProjectObj.color + "22", color: activeProjectObj.color, borderColor: activeProjectObj.color + "55" }}
                 >
-                  <div className="p-0.5">
-                    <div className="text-[9px] px-2 mb-0.5 opacity-50">Category</div>
-
-                    {Object.keys(categoryIcons).map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => handleCategorySelect(cat)}
-                        className={`w-full px-2 py-1 text-[11px] rounded-md flex items-center gap-1 ${
-                          categoryFilter === cat
-                            ? `bg-gradient-to-r ${categoryColors[cat]} text-white`
-                            : isDark
-                            ? "hover:bg-gray-700"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        <span className="text-sm">{categoryIcons[cat]}</span>
-                        <span className="capitalize flex-1 text-left leading-none">{cat}</span>
-                        {categoryFilter === cat && <span className="text-[10px]">✓</span>}
-                      </button>
-                    ))}
-
-                    {categoryFilter && (
-                      <button
-                        onClick={() => {
-                          setCategoryFilter(null);
-                          setShowCategoryDropdown(false);
-                        }}
-                        className={`w-full mt-0.5 px-2 py-1 text-[10px] rounded-md ${
-                          isDark ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-                        }`}
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-2 items-center">
-              <button
-                onClick={clearCompleted}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                  isDark
-                    ? "bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg shadow-red-500/50 hover:shadow-xl"
-                    : "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/50 hover:shadow-xl"
-                }`}
-                title="Clear all completed todos"
-              >
-                <span className="flex items-center gap-2">
-                  <span className="text-lg">🗑️</span>
-                  <span className="font-semibold">Clear Completed</span>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: activeProjectObj.color, display: "inline-block", flexShrink: 0 }} />
+                  {activeProjectObj.name}
                 </span>
+              )}
+              <p className="page-title">{pageTitle}</p>
+            </div>
+          </div>
+
+          {/* View Tabs */}
+          <div className="view-tabs" role="tablist" aria-label="View modes">
+            {[
+              { id: "list",     label: "List",     icon: "☰" },
+              { id: "board",    label: "Board",    icon: "⊞" },
+              { id: "calendar", label: "Calendar", icon: "📅" },
+              { id: "history",  label: "History",  icon: "🕐" },
+            ].map(v => (
+              <button
+                key={v.id}
+                className={`view-tab ${viewMode === v.id ? "active" : ""}`}
+                onClick={() => setViewMode(v.id)}
+                role="tab"
+                aria-selected={viewMode === v.id}
+                aria-label={v.label}
+              >
+                <span>{v.icon}</span>
+                {v.label}
               </button>
+            ))}
+          </div>
+
+          <div className="header-actions">
+            <button className="action-btn danger" onClick={clearCompleted} title="Clear completed tasks" aria-label="Clear all completed tasks">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+              </svg>
+              Clear done
+            </button>
+            <div style={{ position: "relative" }}>
               <TodoDownloadDropdown />
             </div>
           </div>
-        </div>
+        </header>
 
-        <FilterBar />
-
-        {/* Todos grouped */}
-        <div className="mt-10 space-y-6">
-          {groupedTodos.length === 0 ? (
-            <p
-              className={`text-center text-sm tracking-widest uppercase mt-8 transition-colors duration-300 ${
-                isDark ? "text-white/30" : "text-gray-400"
-              }`}
-            >
-              — nothing here yet —
-            </p>
-          ) : (
-            groupedTodos.map((group) => (
-              <div key={group.date} className="relative pl-5 transition-colors duration-300">
-                <span
-                  className={`absolute left-0 top-0 bottom-0 w-[2px] rounded-full ${
-                    isDark
-                      ? "bg-gradient-to-b from-blue-400/60 via-blue-500/20 to-transparent"
-                      : "bg-gradient-to-b from-blue-400 via-blue-200 to-transparent"
-                  }`}
-                />
-
-                <h2
-                  className={`text-[11px] font-semibold tracking-[0.18em] uppercase mb-3 transition-colors duration-300 ${
-                    isDark ? "text-blue-400/80" : "text-blue-500"
-                  }`}
-                >
-                  {formatDateHeader(group.date)}
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {group.todos.map((todo) => (
-                    <TodoItem key={todo.id} todo={todo} />
-                  ))}
-                </div>
+        {/* ── Quick Stats Bar ── */}
+        <div className="quickstats" role="region" aria-label="Task statistics">
+          <div className="quickstat-item accent">
+            <span className="quickstat-num">{totalCount}</span>
+            <span className="quickstat-label">Total<br />Tasks</span>
+          </div>
+          <div className="quickstat-sep" />
+          <div className="quickstat-item indigo">
+            <span className="quickstat-num">{activeCount}</span>
+            <span className="quickstat-label">Active<br />Tasks</span>
+          </div>
+          <div className="quickstat-sep" />
+          <div className="quickstat-item green">
+            <span className="quickstat-num">{completedCount}</span>
+            <span className="quickstat-label">Completed<br />Tasks</span>
+          </div>
+          <div className="quickstat-sep" />
+          <div className="quickstat-item red">
+            <span className="quickstat-num">{overdueCount}</span>
+            <span className="quickstat-label">Overdue<br />Tasks</span>
+          </div>
+          {activeProjectObj && (
+            <>
+              <div className="quickstat-sep" />
+              <div className="quickstat-item" style={{ "--c": activeProjectObj.color }}>
+                <span className="quickstat-num" style={{ color: activeProjectObj.color }}>
+                  {Math.round((completedCount / (totalCount || 1)) * 100)}%
+                </span>
+                <span className="quickstat-label">Project<br />Progress</span>
               </div>
-            ))
+            </>
           )}
+          <div className="progress-bar-wrap">
+            <span className="progress-label">{completionRate}%</span>
+            <div className="progress-bar-track">
+              <div className="progress-bar-fill" style={{ width: `${completionRate}%` }} />
+            </div>
+            <span className="progress-label" style={{ fontSize: "0.64rem", opacity: 0.6 }}>done</span>
+          </div>
         </div>
-      </div>
+
+        {/* ── Main scrollable area ── */}
+        <div className="main-inner">
+
+          {/* Filter pills — list view only */}
+          {viewMode === "list" && (
+            <div className="stats-row">
+              {[
+                { id: "all",       label: "All",     count: totalCount,     cls: "" },
+                { id: "active",    label: "Active",  count: activeCount,    cls: "pill-active-active" },
+                { id: "completed", label: "Done",    count: completedCount, cls: "pill-active-completed" },
+                { id: "overdue",   label: "Overdue", count: overdueCount,   cls: "pill-active-overdue" },
+              ].map(p => (
+                <button
+                  key={p.id}
+                  className={`stats-pill ${filter === p.id && !categoryFilter ? (p.id === "all" ? "pill-active" : p.cls) : ""}`}
+                  onClick={() => handleStatusFilter(p.id)}
+                >
+                  {p.label} <span className="pill-count">{p.count}</span>
+                </button>
+              ))}
+
+              {/* Category dropdown */}
+              <div style={{ position: "relative" }} ref={categoryDropdownRef}>
+                <button
+                  className={`stats-pill ${categoryFilter ? "pill-active-category" : ""}`}
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                >
+                  {categoryFilter
+                    ? <>{categoryIcons[categoryFilter]} {categoryLabels[categoryFilter]}</>
+                    : <>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M4 6h16M7 12h10M10 18h4" />
+                        </svg>
+                        Category
+                      </>
+                  }
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                {showCategoryDropdown && (
+                  <div className="cat-dropdown">
+                    <div className="cat-label">Filter by category</div>
+                    {Object.keys(categoryIcons).map(cat => (
+                      <button
+                        key={cat}
+                        className={`cat-option ${categoryFilter === cat ? "active" : ""}`}
+                        onClick={() => handleCategorySelect(cat)}
+                      >
+                        <span>{categoryIcons[cat]}</span>
+                        <span>{categoryLabels[cat]}</span>
+                        {categoryFilter === cat && (
+                          <svg style={{ marginLeft: "auto" }} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                    {categoryFilter && (
+                      <button className="cat-clear" onClick={() => { setCategoryFilter(null); setShowCategoryDropdown(false); }}>
+                        Clear filter
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Search */}
+          {(viewMode === "list" || viewMode === "board") && <FilterBar />}
+
+          {/* Add Task Form */}
+          {viewMode === "list" && <TodoForm />}
+
+          {/* ── Views ── */}
+          {viewMode === "list" && (
+            <div className="todo-groups animate-fade-in">
+              {groupedTodos.length === 0 ? (
+                <div className="empty-state" role="status" aria-live="polite">
+                  <span className="empty-icon" aria-hidden="true">✓</span>
+                  <p className="empty-label">
+                    {activeProject ? "No tasks in this project yet" : "Nothing here yet — add a task above"}
+                  </p>
+                  <p className="empty-hint">
+                    {activeProject ? "Use the form above to add your first task to this project." : "Type a task name and press Add Task to get started."}
+                  </p>
+                </div>
+              ) : (
+                groupedTodos.map(group => (
+                  <div key={group.date} className={getGroupClass(group.date)}>
+                    <div className="group-header">
+                      <div className="group-line" />
+                      <span className="group-date-label">{formatDateHeader(group.date)}</span>
+                      <div className="group-line" />
+                    </div>
+                    <div className="todo-grid">
+                      {group.todos.map(todo => (
+                        <TodoItem key={todo.id} todo={todo} />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {viewMode === "board"    && <BoardView />}
+          {viewMode === "calendar" && <CalendarView />}
+          {viewMode === "history"  && <HistoryView />}
+        </div>
+      </main>
+
+      {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
+      <PomodoroTimer />
     </div>
   );
 }
@@ -339,10 +441,8 @@ export default function App() {
   return (
     <TodoProvider>
       <ErrorBoundary>
-      <TodoList />
+        <TodoList />
       </ErrorBoundary>
     </TodoProvider>
   );
 }
-
-

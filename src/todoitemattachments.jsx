@@ -1,77 +1,44 @@
+export function TodoItemAttachmentsView({ attachments }) {
+  if (!attachments?.length) return null;
 
-export function TodoItemAttachmentsView({ attachments, isDark }) {
-  if (!attachments || attachments.length === 0) return null;
+  const openAttachment = async (attachment) => {
+    try {
+      const res  = await fetch(attachment.data);
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch {
+      const a = document.createElement("a");
+      a.href = attachment.data;
+      a.download = attachment.name;
+      a.click();
+    }
+  };
 
   return (
-    <div className={`pl-7 space-y-2`}>
-      <div
-        className={`text-xs font-semibold ${
-          isDark ? "text-gray-300" : "text-gray-600"
-        }`}
-      >
+    <div className="card-attachments">
+      <div className="card-attach-label">
         Attachments ({attachments.length})
       </div>
-      <div
-        className={`grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 p-2 rounded border ${
-          isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"
-        }`}
-      >
-        {attachments.map((attachment, index) => (
+      <div className="card-attach-grid">
+        {attachments.map((a, i) => (
           <div
-            key={index}
-            className={`relative group rounded overflow-hidden border cursor-pointer ${
-              isDark ? "border-white/20 bg-white/5" : "border-gray-200 bg-white"
-            }`}
-            onClick={async () => {
-              try {
-                const res = await fetch(attachment.data);
-                const blob = await res.blob();
-                const fileURL = URL.createObjectURL(blob);
-                window.open(fileURL, "_blank");
-              } catch (e) {
-                console.error("Error opening attachment:", e);
-                // Fallback to downloading
-                const link = document.createElement("a");
-                link.href = attachment.data;
-                link.download = attachment.name;
-                link.click();
-              }
-            }}
+            key={i}
+            className="card-attach-item"
+            onClick={() => openAttachment(a)}
+            title={a.name}
           >
-            {attachment.isImage ? (
-              <div className="aspect-square">
-                <img
-                  src={attachment.data}
-                  alt={attachment.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            {a.isImage ? (
+              <img src={a.data} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
             ) : (
-              <div
-                className={`aspect-square flex flex-col items-center justify-center p-1 ${
-                  isDark ? "bg-gray-800" : "bg-gray-100"
-                }`}
-              >
-                <span className="text-2xl mb-0.5">📄</span>
-                <span
-                  className={`text-[10px] text-center truncate w-full px-0.5 ${
-                    isDark ? "text-gray-300" : "text-gray-600"
-                  }`}
-                  title={attachment.name}
-                >
-                  {attachment.name}
-                </span>
+              <div className="card-attach-file">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                  <polyline points="13 2 13 9 20 9"/>
+                </svg>
+                <span className="card-attach-fname">{a.name}</span>
               </div>
             )}
-            <div
-              className={`absolute bottom-0 left-0 right-0 p-1 text-[10px] ${
-                isDark ? "bg-black/70 text-white" : "bg-black/70 text-white"
-              }`}
-            >
-              <div className="truncate" title={attachment.name}>
-                {attachment.name}
-              </div>
-            </div>
           </div>
         ))}
       </div>
@@ -88,121 +55,86 @@ export function TodoItemAttachmentsEdit({
   onFileSelect,
   onRemoveAttachment,
 }) {
+  const canAdd = attachments.length < maxAttachments;
+
   return (
-    <div className="space-y-2 pl-7">
-      <div className="flex items-center gap-2 flex-wrap">
+    <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+      {/* Controls */}
+      <div style={{ display:"flex", alignItems:"center", gap:"0.375rem", flexWrap:"wrap" }}>
         <label
-          className={`px-2 py-1 rounded text-xs font-medium transition-all duration-300 cursor-pointer ${
-            attachments.length >= maxAttachments
-              ? isDark
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed opacity-50"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
-              : isDark
-              ? "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 border border-blue-500/30"
-              : "bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-300"
-          }`}
+          style={{ cursor: canAdd ? "pointer" : "not-allowed", opacity: canAdd ? 1 : 0.4 }}
+          className="card-ctrl-btn"
+          title="Add image"
         >
-          <span className="flex items-center gap-1">
-            <span>📷</span>
-            <span>Image</span>
-          </span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          Image
           <input
             ref={imageInputRef}
             type="file"
             accept="image/*"
             multiple
-            disabled={attachments.length >= maxAttachments}
-            onChange={(e) => onFileSelect(e, true)}
-            className="hidden"
+            hidden
+            disabled={!canAdd}
+            onChange={onFileSelect}
           />
         </label>
 
         <label
-          className={`px-2 py-1 rounded text-xs font-medium transition-all duration-300 cursor-pointer ${
-            attachments.length >= maxAttachments
-              ? isDark
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed opacity-50"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
-              : isDark
-              ? "bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 border border-purple-500/30"
-              : "bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-300"
-          }`}
+          style={{ cursor: canAdd ? "pointer" : "not-allowed", opacity: canAdd ? 1 : 0.4 }}
+          className="card-ctrl-btn"
+          title="Add file"
         >
-          <span className="flex items-center gap-1">
-            <span>📎</span>
-            <span>File</span>
-          </span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+          </svg>
+          File
           <input
             ref={fileInputRef}
             type="file"
             multiple
-            disabled={attachments.length >= maxAttachments}
-            onChange={(e) => onFileSelect(e, false)}
-            className="hidden"
+            hidden
+            disabled={!canAdd}
+            onChange={onFileSelect}
           />
         </label>
 
         {attachments.length > 0 && (
-          <span
-            className={`text-xs px-2 py-1 rounded ${
-              isDark ? "bg-white/10 text-gray-300" : "bg-gray-100 text-gray-600"
-            }`}
-          >
+          <span style={{ fontSize:"0.7rem", color:"var(--text-muted)" }}>
             {attachments.length}/{maxAttachments}
           </span>
         )}
       </div>
 
+      {/* Thumbs */}
       {attachments.length > 0 && (
-        <div
-          className={`p-2 rounded border ${
-            isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200"
-          }`}
-        >
-          <div className="grid grid-cols-3 gap-2">
-            {attachments.map((attachment, index) => (
-              <div
-                key={index}
-                className={`relative group rounded overflow-hidden border ${
-                  isDark ? "border-white/20 bg-white/5" : "border-gray-200 bg-white"
-                }`}
+        <div className="card-attach-grid">
+          {attachments.map((a, i) => (
+            <div key={i} className="card-attach-item" style={{ position:"relative" }}>
+              {a.isImage ? (
+                <img src={a.data} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              ) : (
+                <div className="card-attach-file">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                    <polyline points="13 2 13 9 20 9"/>
+                  </svg>
+                  <span className="card-attach-fname">{a.name}</span>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => onRemoveAttachment(i)}
+                className="attachment-remove"
+                style={{ opacity: 1 }}
+                aria-label="Remove"
               >
-                {attachment.isImage ? (
-                  <div className="aspect-square">
-                    <img
-                      src={attachment.data}
-                      alt={attachment.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className={`aspect-square flex flex-col items-center justify-center p-1 ${
-                      isDark ? "bg-gray-800" : "bg-gray-100"
-                    }`}
-                  >
-                    <span className="text-2xl mb-0.5">📄</span>
-                    <span
-                      className={`text-[10px] text-center truncate w-full px-0.5 ${
-                        isDark ? "text-gray-300" : "text-gray-600"
-                      }`}
-                      title={attachment.name}
-                    >
-                      {attachment.name}
-                    </span>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => onRemoveAttachment(index)}
-                  className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 text-xs"
-                  title="Remove"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -1,0 +1,224 @@
+/* ─── Dashboard Overlay ───────────────── */
+
+/* UX: Modal overlay — darkens background to focus attention on dashboard */
+.dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s ease;
+  padding: 1rem;
+}
+
+/* UX: Panel slides up — feels like it's being revealed, not popping */
+.dashboard-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* UX: Header stays fixed as content scrolls */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  flex-shrink: 0;
+}
+
+.dashboard-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* UX: Close button is obvious (top-right, X) — universal convention */
+.dashboard-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+.dashboard-close:hover { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+
+/* UX: 2-col grid for stat cards — scannability without scrolling */
+.dashboard-content {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 560px) {
+  .dashboard-content { grid-template-columns: 1fr; }
+}
+
+/* UX: Stat cards have a clear hierarchy: label → value → description */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.125rem;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+
+.stat-card h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+/* UX: Monospaced large number — tabular-nums keeps layout stable as numbers change */
+.stat-card-value {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Radial progress ─── */
+
+/* UX: Radial progress is more glanceable than a bar at this size */
+.radial-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.radial-svg { flex-shrink: 0; }
+.radial-track { fill: none; stroke: var(--bg-surface-3); stroke-width: 8; }
+.radial-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.radial-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  fill: var(--text-primary);
+  dominant-baseline: middle;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Category bar chart ─── */
+.cat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+.cat-bar-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 80px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.cat-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.cat-bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  min-width: 20px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Productivity heatmap ─── */
+
+/* UX: Heatmap shows effort density — user sees when they're most productive */
+.heatmap-grid {
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(7, 1fr);
+}
+.heatmap-cell {
+  height: 18px;
+  border-radius: 3px;
+  background: var(--bg-surface-3);
+  transition: transform var(--transition-fast);
+  cursor: default;
+}
+.heatmap-cell:hover { transform: scale(1.25); }
+.heatmap-cell.lv1 { background: rgba(232,98,26,0.2); }
+.heatmap-cell.lv2 { background: rgba(232,98,26,0.45); }
+.heatmap-cell.lv3 { background: rgba(232,98,26,0.7); }
+.heatmap-cell.lv4 { background: var(--accent); }
+
+/* ─── Heatmap legend ─── */
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+.heatmap-legend-dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  margin-left: auto;
+}
+.heatmap-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}

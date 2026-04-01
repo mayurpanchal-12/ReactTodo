@@ -1,58 +1,35 @@
-import { useState, useRef, useEffect } from 'react';
-import { useTodo } from './todocontext';
-import { downloadTodoCSV } from './utils/csv';
-import { downloadTodoPDF } from './utils/pdf';
+import { useEffect, useRef, useState } from "react";
+import { useTodo } from "./todocontext";
+import { downloadTodoCSV } from "./utils/csv";
+import { downloadTodoPDF } from "./utils/pdf";
 
 export default function TodoDownloadDropdown() {
   const [open, setOpen] = useState(false);
-  const { filteredTodos, theme, categoryFilter } = useTodo();
+  const { filteredTodos, categoryFilter } = useTodo();
 
-  const isDark = theme === 'dark';
   const isDisabled = categoryFilter !== null;
   const wrapperRef = useRef(null);
 
-  /* ---------- Close on outside click ---------- */
   useEffect(() => {
     function handleClickOutside(e) {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target)
-      ) {
-        setOpen(false);
-      }
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
     }
-
-    document.addEventListener('click', handleClickOutside);
-    return () =>
-      document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  /* ---------- Handlers ---------- */
   const handleCSV = (e) => {
     e.stopPropagation();
-
-    if (filteredTodos.length === 0) {
-      alert('No visible todos to download');
-      return;
-    }
-
+    if (!filteredTodos.length) { alert("No visible todos to download"); return; }
     downloadTodoCSV(filteredTodos);
     setOpen(false);
   };
 
   const handlePDF = async (e) => {
     e.stopPropagation();
-
-    if (filteredTodos.length === 0) {
-      alert('No visible todos to download');
-      return;
-    }
-
-    const success = await downloadTodoPDF(filteredTodos);
-    if (!success) {
-      alert('PDF download failed. Check the console for details.');
-    }
-
+    if (!filteredTodos.length) { alert("No visible todos to download"); return; }
+    const ok = await downloadTodoPDF(filteredTodos);
+    if (!ok) alert("PDF download failed.");
     setOpen(false);
   };
 
@@ -60,80 +37,41 @@ export default function TodoDownloadDropdown() {
     <div className="relative" ref={wrapperRef}>
       <button
         type="button"
+        className="action-btn primary"
         disabled={isDisabled}
-        title={
-          isDisabled
-            ? 'Download disabled when category filter is active'
-            : 'Download todos'
-        }
-        onClick={(e) => {
-          if (!isDisabled) {
-            e.stopPropagation();
-            setOpen((prev) => !prev);
-          }
-        }}
-        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 transform ${
-          isDisabled
-            ? 'opacity-50 cursor-not-allowed'
-            : 'hover:scale-105 cursor-pointer'
-        } ${
-          isDisabled
-            ? isDark
-              ? 'bg-gray-700 text-gray-500'
-              : 'bg-gray-300 text-gray-500'
-            : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-blue-500/50 hover:shadow-xl'
-        }`}
+        title={isDisabled ? "Download disabled when category filter is active" : "Export tasks"}
+        onClick={(e) => { if (!isDisabled) { e.stopPropagation(); setOpen((p) => !p); } }}
       >
-        <span className="flex items-center gap-2">
-          <span className="text-lg">💾</span>
-          <span className="font-semibold">Download</span>
-          <span className="text-sm">⬇</span>
-        </span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export
       </button>
 
       {open && !isDisabled && (
-        <div
-          className={`absolute top-full right-0 mt-2 z-50 min-w-[150px] rounded-lg border shadow-xl backdrop-blur-md transition-all duration-300 ${
-            isDark
-              ? 'bg-gray-800 border-gray-700'
-              : 'bg-white border-gray-200'
-          }`}
-        >
-          <div className="p-2">
-            <div
-              className={`mb-2 px-2 py-1 text-xs font-semibold ${
-                isDark ? 'text-gray-400' : 'text-gray-600'
-              }`}
-            >
-              Export Format
-            </div>
-
-            <button
-              type="button"
-              onClick={handleCSV}
-              className={`mb-1 flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-                isDark
-                  ? 'text-white hover:bg-gray-700'
-                  : 'text-gray-800 hover:bg-gray-100'
-              }`}
-            >
-              <span>📄</span>
-              <span>CSV</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handlePDF}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all ${
-                isDark
-                  ? 'text-white hover:bg-gray-700'
-                  : 'text-gray-800 hover:bg-gray-100'
-              }`}
-            >
-              <span>📑</span>
-              <span>PDF</span>
-            </button>
-          </div>
+        <div className="dl-dropdown">
+          <div className="cat-label" style={{ marginBottom: "0.25rem" }}>Format</div>
+          <button className="dl-option" type="button" onClick={handleCSV}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            CSV Spreadsheet
+          </button>
+          <button className="dl-option" type="button" onClick={handlePDF}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            PDF Document
+          </button>
         </div>
       )}
     </div>

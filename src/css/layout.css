@@ -1,0 +1,183 @@
+/* ─── App Layout ──────────────────────── */
+
+/* UX: Full-height layout with no overflow clipping on main axis */
+.app-bg {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--bg-base);
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+/* ─── Main Area ─────────────────────── */
+
+/* UX: Column flex so topbar stays sticky and content scrolls */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* UX: Comfortable reading width + breathing room at bottom for Pomodoro widget */
+.main-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.75rem 6rem; /* extra bottom padding — avoids Pomodoro overlap */
+  max-width: 100%;
+}
+
+/* ─── View Toggle Tabs ───────────────── */
+
+/* UX: Segmented control pattern — clear which view is active */
+.view-tabs {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+.view-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  white-space: nowrap;
+  /* UX: Min height for touch targets */
+  min-height: 32px;
+}
+.view-tab:hover { color: var(--text-primary); background: var(--bg-surface); }
+.view-tab.active {
+  background: var(--bg-surface);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ─── Todo Groups ────────────────────── */
+.todo-groups { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.todo-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.todo-group.group-today .group-date-label   { color: var(--accent); }
+.todo-group.group-overdue .group-date-label { color: var(--red); }
+
+/* UX: Date dividers give clear temporal hierarchy */
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.group-line { flex: 1; height: 1px; background: var(--border-subtle); }
+.group-date-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.todo-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* ─── Empty State ────────────────────── */
+
+/* UX: Empty states guide users — not just blank space */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  gap: 0.75rem;
+  animation: fadeIn 0.3s ease;
+}
+.empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.2;
+  /* UX: Subtle scale on load gives life to otherwise static icon */
+  animation: slideUp 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.empty-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 280px;
+}
+.empty-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.65;
+  margin-top: -0.25rem;
+}
+
+/* ─── Download dropdown ──────────────── */
+.dl-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 180px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  animation: dropIn 0.15s ease;
+  /* UX: Backdrop blur makes overlay legible over any content */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.dl-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  /* UX: Min height for touch comfort */
+  min-height: 36px;
+}
+.dl-option:hover { background: var(--bg-surface-2); color: var(--text-primary); }
+
+/* ─── Responsive: Mobile-first adjustments ─── */
+
+/* UX: On small screens, reduce padding and make content full-width */
+@media (max-width: 640px) {
+  .main-inner {
+    padding: 1rem 1rem 6rem;
+  }
+
+  /* UX: View tabs collapse to icon-only on mobile */
+  .view-tab span:last-child {
+    display: none;
+  }
+
+  .view-tab {
+    padding: 0.35rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-inner {
+    padding: 0.75rem 0.75rem 6rem;
+  }
+}

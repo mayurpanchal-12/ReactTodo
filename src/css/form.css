@@ -1,0 +1,631 @@
+/* ─── Todo Form ───────────────────────────────────────────────── */
+
+.todo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.125rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.todo-form:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-md);
+}
+
+
+/* ─── Row 1: Main input + submit ──────────────────────────────── */
+
+.tf-main-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.tf-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.tf-text-input {
+  width: 100%;
+  padding: 0.625rem 2.75rem 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  min-height: 42px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.tf-text-input:hover:not(:focus) {
+  border-color: var(--text-muted);
+}
+
+.tf-text-input:focus {
+  border-color: var(--accent);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.tf-text-input::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tf-voice-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.tf-voice-btn:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.tf-voice-btn.is-listening {
+  color: var(--red);
+  animation: pulse-ring 1.2s ease infinite;
+}
+
+.tf-submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 1.125rem;
+  height: 42px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-accent);
+  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+}
+
+.tf-submit-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.tf-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-accent);
+}
+
+
+/* ─── Row 2: Date / Time / Repeat / Project ───────────────────── */
+
+.tf-meta-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.tf-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tf-field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: default;
+  user-select: none;
+}
+
+.tf-meta-input {
+  padding: 0.4rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  min-height: 34px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tf-meta-input:hover:not(:focus) {
+  border-color: var(--text-muted);
+}
+
+.tf-meta-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.tf-select {
+  cursor: pointer;
+}
+
+.tf-meta-input[type="date"]::-webkit-calendar-picker-indicator,
+.tf-meta-input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+  cursor: pointer;
+  filter: invert(0.4);
+}
+
+.dark .tf-meta-input[type="date"]::-webkit-calendar-picker-indicator,
+.dark .tf-meta-input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.65);
+}
+
+
+/* ─── Row 3: Priority / Category / Toggles ────────────────────── */
+
+.tf-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tf-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+.tf-seg-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.tf-seg-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 28px;
+  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  white-space: nowrap;
+}
+
+.tf-seg-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.tf-seg-btn.is-active {
+  background: var(--bg-surface);
+  font-weight: 600;
+  box-shadow: var(--shadow-xs);
+}
+
+.tf-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.tf-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 30px;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tf-toggle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.tf-toggle-btn.is-on {
+  border-color: var(--indigo);
+  color: var(--indigo);
+  background: var(--indigo-soft);
+  font-weight: 600;
+}
+
+.tf-toggle-btn.is-pinned {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.tf-toggle-btn.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.tf-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  opacity: 0.85;
+  line-height: 1;
+}
+
+
+/* ─── Expanded sections ───────────────────────────────────────── */
+
+.tf-expanded-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  animation: slideDown 0.15s ease both;
+}
+
+.tf-notes-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  min-height: 80px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tf-notes-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.tf-notes-input::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Tags inline chip input */
+.tf-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: text;
+  min-height: 38px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tf-tags-wrap:focus-within {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 2px var(--indigo-soft);
+}
+
+.tf-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--indigo-soft);
+  color: var(--indigo);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.tf-tag-remove {
+  border: none;
+  background: transparent;
+  color: var(--indigo);
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.1s;
+}
+
+.tf-tag-remove:hover { opacity: 1; color: var(--red); }
+
+.tf-tag-input {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  outline: none;
+  padding: 0.1rem 0.2rem;
+}
+
+.tf-tag-input::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* Subtasks */
+.tf-subtask-add-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tf-subtask-input {
+  flex: 1;
+  padding: 0.4rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  outline: none;
+  min-height: 34px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tf-subtask-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.tf-subtask-input::placeholder { color: var(--text-muted); }
+
+.tf-subtask-add-btn {
+  padding: 0.4rem 0.875rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.tf-subtask-add-btn:hover { background: var(--accent-hover); }
+
+.tf-subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  list-style: none;
+  margin-top: 0.25rem;
+}
+
+.tf-subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.12s;
+}
+
+.tf-subtask-item:hover { border-color: var(--border); }
+
+.tf-subtask-check {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.tf-subtask-text {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  outline: none;
+  min-width: 0;
+  transition: color 0.15s;
+}
+
+.tf-subtask-text.is-done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.tf-subtask-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.tf-subtask-remove:hover {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+
+/* ─── Attachment previews ─────────────────────────────────────── */
+
+.tf-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tf-attachment-thumb {
+  position: relative;
+  overflow: hidden;
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  transition: border-color 0.12s;
+}
+
+.tf-attachment-thumb:hover { border-color: var(--accent); }
+
+.tf-attachment-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tf-attachment-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+  padding: 0.375rem;
+}
+
+.tf-attachment-name {
+  font-size: 0.5rem;
+  color: var(--text-secondary);
+  text-align: center;
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+.tf-attachment-size {
+  font-size: 0.48rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.tf-attachment-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.12s, transform 0.12s;
+}
+
+.tf-attachment-thumb:hover .tf-attachment-remove { opacity: 1; }
+.tf-attachment-remove:hover { transform: scale(1.15); }
+
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .tf-submit-btn {
+    padding: 0 0.875rem;
+    font-size: 0.78rem;
+  }
+
+  .tf-seg-btn span,
+  .tf-toggle-btn span:not(.tf-badge) {
+    display: none;
+  }
+
+  .tf-seg-btn,
+  .tf-toggle-btn {
+    padding: 0.28rem 0.45rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .todo-form { padding: 0.875rem; }
+  .tf-divider { display: none; }
+}

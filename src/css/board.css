@@ -1,0 +1,144 @@
+/* ─── Board View ──────────────────────── */
+
+/* UX: Board view gives spatial overview — tasks have a "place" */
+.board-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  animation: fadeIn 0.22s ease;
+}
+
+.board-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  min-height: 480px;
+}
+
+@media (max-width: 900px) {
+  .board-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 640px) and (max-width: 900px) {
+  .board-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── Board Column ─────────────────── */
+
+/* UX: Columns have distinct top-border colors — Todo=indigo, In-Progress=amber, Done=green */
+.board-column {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-height: 400px;
+  overflow: hidden;
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+/* UX: Drag-over state is unmistakable — colored border + glow */
+.board-column.drag-over {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-md);
+  background: var(--accent-soft);
+}
+
+.board-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.board-col-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.board-col-accent {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* UX: Task count badge is monospaced — numbers align properly */
+.col-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px; height: 22px;
+  padding: 0 6px;
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.board-column-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.875rem;
+  overflow-y: auto;
+  min-height: 300px;
+}
+
+/* UX: Grab cursor signals draggability before user tries to drag */
+.board-task-wrap {
+  cursor: grab;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  border-radius: var(--radius-md);
+}
+.board-task-wrap:hover { transform: translateY(-1px); }
+.board-task-wrap:active { cursor: grabbing; opacity: 0.75; transform: scale(0.98); }
+.board-task-wrap .todo-card { margin: 0; }
+
+/* UX: Empty drop zone uses dashed border — clear "drop here" affordance */
+.empty-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 120px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  pointer-events: none;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+.board-column.drag-over .empty-zone {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* UX: Semantic top-border colors — instant column identification */
+.board-col-todo .board-col-accent     { background: var(--indigo); }
+.board-col-progress .board-col-accent { background: var(--amber); }
+.board-col-done .board-col-accent     { background: var(--green); }
+
+.board-col-todo     .board-column-header { border-top: 3px solid var(--indigo); }
+.board-col-progress .board-column-header { border-top: 3px solid var(--amber); }
+.board-col-done     .board-column-header { border-top: 3px solid var(--green); }
+
+/* UX: Done column cards are visually de-emphasized — focus is on active work */
+.board-col-done .todo-card { opacity: 0.72; }
+.board-col-done .todo-card:hover { opacity: 1; }

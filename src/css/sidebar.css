@@ -1,0 +1,505 @@
+/* ─── Sidebar ─────────────────────────── */
+
+/* UX: Off-canvas sidebar — accessible via hamburger, closes on overlay tap or Escape */
+.app-sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  width: var(--sidebar-w);
+  height: 100dvh;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 0.875rem;
+  transform: translateX(calc(-1 * var(--sidebar-w)));
+  transition: transform var(--transition-slow), background-color 0.3s, border-color 0.3s;
+  will-change: transform;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 0;
+  /* UX: Scrollbar hidden by default in sidebar — cleaner look */
+  scrollbar-width: thin;
+}
+.app-sidebar.open {
+  transform: translateX(0);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ─── Logo ──────────────────────────── */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  padding: 0 0.375rem;
+  user-select: none;
+}
+.sidebar-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 10px var(--accent-glow);
+  /* UX: Subtle inner glow on icon to feel premium */
+  outline: 1px solid rgba(255,255,255,0.15);
+  outline-offset: -2px;
+}
+.sidebar-logo span { color: var(--accent); }
+
+/* ─── Close Button ─────────────────── */
+
+/* UX: Close button accessible by keyboard (Escape also works) */
+.sidebar-close-btn {
+  position: absolute;
+  top: 0.875rem; right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  transition: all var(--transition-fast);
+}
+.sidebar-close-btn:hover { background: var(--red-soft); color: var(--red); }
+
+/* ─── Quick Add ─────────────────────── */
+
+/* UX: Primary action in sidebar is always "New Task" — high contrast, hard to miss */
+.sidebar-quick-add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.875rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-accent);
+  letter-spacing: -0.01em;
+  font-family: var(--font-body);
+  /* UX: Minimum touch target */
+  min-height: 40px;
+}
+.sidebar-quick-add:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px var(--accent-glow);
+}
+.sidebar-quick-add:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-accent);
+}
+
+/* ─── Section Label ───────────────── */
+
+/* UX: Section labels are uppercase tiny text — structural, not content */
+.sidebar-section-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 0.375rem;
+  margin-bottom: 0.25rem;
+  margin-top: 1rem;
+  user-select: none;
+}
+
+/* ─── Divider ───────────────────── */
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0.75rem 0;
+}
+
+/* ─── Nav ──────────────────────────── */
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+
+/* UX: Nav items have left-translate on hover — spatial cue showing "entering" that section */
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  font-family: var(--font-body);
+  /* UX: Min height for touch comfort */
+  min-height: 36px;
+}
+.sidebar-nav-item:hover {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+/* UX: Active item uses accent color — wayfinding */
+.sidebar-nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  background: var(--bg-surface-2);
+  font-size: 0.75rem;
+  transition: background var(--transition-fast);
+}
+.sidebar-nav-item.active .nav-icon { background: var(--accent-soft); }
+
+.nav-count {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  background: var(--bg-surface-3);
+  color: var(--text-muted);
+  padding: 0.1rem 0.375rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+/* UX: Red badge for urgent counts — matches overdue pill color */
+.nav-count.count-urgent { background: var(--red-soft); color: var(--red); }
+
+/* ─── Footer ────────────────────────── */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.375rem 0;
+}
+.sidebar-footer-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  user-select: none;
+}
+
+/* UX: Theme toggle is clearly a toggle (icon switches) — no ambiguity */
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* ─── Pinned Panel ──────────────────── */
+.pinned-empty, .tags-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.375rem;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.pinned-panel { display: flex; flex-direction: column; gap: 2px; }
+.pinned-item  { display: flex; align-items: center; gap: 2px; }
+
+.pinned-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-align: left;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 32px;
+  min-width: 0;
+}
+.pinned-item-btn:hover { background: var(--bg-surface-2); color: var(--text-primary); }
+
+.pinned-priority-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pinned-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.pinned-unpin-btn {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+.pinned-unpin-btn:hover { background: var(--red-soft); color: var(--red); }
+
+/* ─── Tags Panel ────────────────────── */
+.tags-panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0.25rem 0;
+}
+/* UX: Tags are colored pill chips — visual grouping at a glance */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  line-height: 1;
+  min-height: 24px;
+}
+.tag-chip:hover { filter: brightness(0.92); transform: translateY(-1px); }
+.tag-count {
+  font-size: 0.6rem;
+  opacity: 0.75;
+  font-family: var(--font-mono);
+}
+.tag-clear-btn {
+  width: 100%;
+  text-align: center;
+  padding: 0.3rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  transition: color var(--transition-fast);
+  font-family: var(--font-body);
+}
+.tag-clear-btn:hover { color: var(--red); }
+
+/* ─── Projects Panel ─────────────────── */
+.projects-panel { display: flex; flex-direction: column; gap: 2px; }
+
+.project-item-wrap { position: relative; }
+.project-item-wrap:hover .project-actions { opacity: 1; }
+
+.project-color-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.project-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.project-nav-item { padding-right: 3rem; }
+
+/* UX: Mini progress bar under project — completion at a glance */
+.project-progress-bar {
+  height: 2px;
+  background: var(--bg-surface-3);
+  border-radius: var(--radius-pill);
+  margin: 1px 0.5rem 3px;
+  overflow: hidden;
+}
+.project-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* UX: Project actions appear on hover only — progressive disclosure */
+.project-actions {
+  position: absolute;
+  top: 50%; right: 0.25rem;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+.project-action-btn {
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+.project-action-btn:hover { background: var(--bg-surface-2); color: var(--text-primary); }
+.project-action-btn.danger:hover { background: var(--red-soft); color: var(--red); }
+
+.project-edit-input {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+  font-family: var(--font-body);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  animation: slideDown 0.15s ease;
+}
+.project-name-input {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 34px;
+}
+.project-name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+.color-picker { display: flex; flex-wrap: wrap; gap: 4px; padding: 2px 0; }
+.color-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.selected { border-color: var(--text-primary); transform: scale(1.15); }
+
+.project-form-btns { display: flex; gap: 0.5rem; }
+.project-add-btn {
+  flex: 1; padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent); color: #fff;
+  font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 32px;
+}
+.project-add-btn:hover { background: var(--accent-hover); }
+.project-cancel-btn {
+  flex: 1; padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+  font-size: 0.78rem; cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 32px;
+}
+.project-cancel-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* UX: Dashed border signals "add new" affordance universally */
+.add-project-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border);
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  transition: all var(--transition-fast);
+  margin-top: 2px;
+  font-family: var(--font-body);
+  min-height: 32px;
+}
+.add-project-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* ─── Overlay ────────────────────────── */
+
+/* UX: Backdrop makes sidebar context clear — content is behind, sidebar is on top */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+.sidebar-overlay.visible { opacity: 1; pointer-events: all; }

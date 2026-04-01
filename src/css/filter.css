@@ -1,0 +1,105 @@
+/* ─── Search / Filter Bar ──────────────── */
+
+/* UX: Search bar is full-width and prominent — users expect it at top of list */
+.filter-bar { margin-bottom: 1rem; }
+
+/* UX: Input group uses border + background to look like a single element */
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.search-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.search-input-wrap:hover:not(:focus-within) {
+  border-color: var(--text-muted);
+}
+
+/* UX: Search icon is non-interactive — communicates "this is search" */
+.search-icon-left {
+  padding: 0 0.625rem 0 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.575rem 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.855rem;
+  outline: none;
+  /* UX: Min height for touch comfort */
+  min-height: 40px;
+  font-family: var(--font-body);
+}
+.search-input::placeholder { color: var(--text-muted); }
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0 0.5rem;
+  flex-shrink: 0;
+}
+
+/* UX: Clear button is circular — signals "remove" not "submit" */
+.search-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-surface-3);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  animation: fadeIn 0.15s ease;
+}
+.search-clear-btn:hover { background: var(--border); color: var(--text-primary); }
+
+/* UX: Go button inside search — saves horizontal space vs separate button */
+.search-go-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  min-height: 30px;
+}
+.search-go-btn:hover { background: var(--accent-hover); }
+.search-go-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* UX: Active search tag shows what filter is active — users never wonder "what am I searching for" */
+.search-active-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--accent-glow);
+  animation: fadeIn 0.15s ease;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
