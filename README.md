@@ -1,15 +1,14 @@
-# TaskFlow — Advanced Todo Manager
+# TaskFlow — Cloud Task Manager
 
 ![React](https://img.shields.io/badge/React-18-blue?logo=react)
-![Vite](https://img.shields.io/badge/Vite-Fast-green?logo=vite)
-![Context API](https://img.shields.io/badge/Context_API-State_Management-orange)
-![localStorage](https://img.shields.io/badge/localStorage-Persistent-yellow)
-![GitHub](https://img.shields.io/badge/GitHub-Repo-black?logo=github)
-![Vercel](https://img.shields.io/badge/Vercel-Deployment-black?logo=vercel)
+![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-orange?logo=firebase)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-File%20Storage-3448C5?logo=cloudinary)
+![Vite](https://img.shields.io/badge/Vite-Fast%20Build-green?logo=vite)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
 
 ---
 
-A **production-grade task management Single Page Application** built with React and Context API. Demonstrates real-world frontend engineering including **state management, drag-and-drop, voice input, analytics, accessibility (WCAG 2.x), and responsive design.**
+A **production-grade cloud task management SPA** built with React 18, Firebase Auth, Firestore, and Cloudinary. Every piece of your data lives in the cloud — open the app on two devices and watch changes appear instantly in real time.
 
 ---
 
@@ -19,250 +18,195 @@ A **production-grade task management Single Page Application** built with React 
 
 ## 🔗 GitHub Repository
 
-[View source code on GitHub](https://github.com/mayurpanchal-12/ReactTodo.git)
-
----
-
-## 🚀 Project Overview
-
-TaskFlow is a complete task management platform where users can:
-
-- Create, edit, delete, and complete tasks with priority, category, due date, subtasks, and markdown notes
-- Manage projects in a Notion-style workspace with color labels
-- Drag and drop tasks across a Kanban board (Todo → In Progress → Done)
-- Browse tasks on a calendar view by due date
-- View analytics — completion rate, GitHub-style activity heatmap, category charts
-- Use voice input to create tasks hands-free
-- Attach images and files per task
-- Export filtered tasks as CSV or PDF
-- Track all activity in a creative history log
-
-The project focuses on **production-level practices** — design tokens, accessibility, mobile-first layout, and purpose-driven animations.
-
----
-
-## 📱 Application Flow
-
-```
-Open App → Sidebar: Focus / Today / Projects / Pinned / Tags / Analytics / History
-        ↓
-Click Focus → Today's high-priority tasks only
-        ↓
-Click Projects → Create Notion-style project with color label
-        ↓
-Add Task → text + date + time + priority + category + voice input
-        ↓
-Attach images (max 2MB) or files (max 5MB), up to 5 per task
-Add subtasks (nested checklist) + markdown notes
-        ↓
-Task saved → grouped by due date, sorted by priority within group
-        ↓
-Switch to Board View → drag tasks across Todo / In Progress / Done
-        ↓
-Switch to Calendar View → tasks plotted on calendar by due date
-        ↓
-Click Analytics → completion rate, GitHub heatmap, category chart, status overview
-        ↓
-Click History → creative log of every add / edit / delete with timestamps
-        ↓
-Filter by status or category → debounced search highlights matches inline
-        ↓
-Export filtered tasks as CSV or PDF → toggle dark / light mode (persists via localStorage)
-```
-
----
-
-## 🧭 Navigation (Sidebar)
-
-- 🎯 Focus Mode — today's high-priority tasks
-- 📋 All Tasks — full list grouped by due date
-- 📁 Projects — Notion-style project workspaces
-- 📌 Pinned — all pinned tasks
-- 🏷️ Tags — tasks grouped by #tag
-- 📊 Analytics — heatmap, charts, completion stats
-- 🗓️ Calendar — tasks by due date on a calendar
-- 🗃️ Board — Kanban drag-and-drop view
-- 🕓 History — activity log (add / edit / delete)
-- ☀️🌙 Theme — dark / light toggle
+[View source on GitHub](https://github.com/mayurpanchal-12/ReactTodo.git)
 
 ---
 
 ## 🛠 Tech Stack
 
-### Core
-
-- React 18 (Hooks — useState, useEffect, useRef, useContext)
-- Context API — centralized state for todos, filters, theme, projects, history
-- CSS Custom Properties — full design token system
-- Vite — fast dev server and optimized build
-
-### Browser APIs
-
-- Web Speech API — voice-to-text input
-- Drag and Drop API — native Kanban board
-- FileReader API — image and file attachments as base64
-- localStorage — persistent data, theme, and history across refresh
-
-### Libraries & Tools
-
-- jsPDF — dynamic PDF export of filtered tasks
-- Vercel — deployment
+| Layer | Technology |
+|---|---|
+| UI | React 18, CSS Custom Properties, Vite |
+| Auth | Firebase Authentication (Google + Email/Password) |
+| Database | Cloud Firestore (real-time sync) |
+| File Storage | Cloudinary (direct browser uploads) |
+| Deployment | Vercel (auto-deploy on push) |
+| Export | jsPDF (dynamic import), native CSV |
+| Voice | Web Speech API |
+| Drag & Drop | Native HTML5 Drag and Drop API |
 
 ---
 
-## ✨ Core Features
+## ✨ Full Feature List
 
-- **CRUD** — add, edit, delete, toggle complete
-- **Sidebar** — focus mode, projects, pinned, tags, analytics, theme, history
-- **Notion-style projects** — create projects with color labels, assign tasks
-- **Pinned tasks** — pin any task, view all pinned in sidebar
-- **Tag collections** — group by #tag, browse from sidebar
-- **Kanban board** — drag-and-drop across Todo / In Progress / Done
-- **Calendar view** — tasks plotted by due date, click to filter
-- **Analytics dashboard** — completion rate, GitHub-style heatmap, category chart, status overview
-- **Activity history** — creative chronological log with timestamps
-- **Subtasks** — nested checklist with progress bar
-- **Markdown notes** — per-task editor with bold, italic, code rendering
-- **Voice input** — Web Speech API fills text field from microphone
-- **Attachments** — images (max 2MB) and files (max 5MB), up to 5 per task
-- **Repeat tasks** — daily / weekly / monthly recurrence
-- **Pomodoro timer** — per-task focus timer, bottom-sheet on mobile
-- **Debounced search** — 300ms debounce, highlights matches inline
-- **Filters** — by status (All / Active / Completed / Overdue) and category
-- **Export** — filtered tasks as CSV or PDF (blocked on category filter to avoid partial data)
-- **Dark / Light mode** — all CSS tokens fully remapped, not just inverted
-- **Error Boundary** — catches render crashes, shows fallback UI with refresh prompt
-- **Persistent storage** — all data, theme, projects, and history survive page refresh
+### 🔐 Auth & Account
+- Google OAuth sign-in and email/password login on the same screen
+- New account registration with password confirmation
+- Forgot password — reset link sent via Firebase email
+- Delete account — automatically re-authenticates via Google popup if the session is stale, then deletes cleanly
+- All data is isolated per user — Firestore security rules enforce this server-side, not just in the UI
 
----
+### ✅ Task Creation
+- Task name with voice input (Web Speech API — click mic, speak, done)
+- Due date + time picker
+- Priority — 🔴 High / 🟡 Medium / 🟢 Low
+- Category — 💰 Finance / 📚 Study / 💼 Work / 📝 Other
+- Repeat — None / Daily / Weekly / Monthly (auto-clones task on completion with next due date)
+- Assign to a project directly from the form
+- Pin a task directly from the form
+- Add #tags directly from the form
+- Add subtasks (nested checklist) directly from the form
+- Add markdown notes (bold, italic, code) directly from the form
+- Attach images (max 2MB) or files (max 5MB), up to 5 per task — uploaded to Cloudinary
 
-## 🔥 Key Highlights
+### 📋 List View
+- Tasks grouped by due date — Today, Tomorrow, or weekday label
+- Within each group, sorted High → Medium → Low priority automatically
+- Overdue tasks get a red accent and overdue badge
+- Skeleton loading cards shown while Firestore data loads after login
+- Empty state message when no tasks match the active filter
 
-### 📌 Sidebar Navigation
-Collapsible sidebar with focus mode, Notion-style project workspaces, pinned tasks, tag browser, analytics dashboard, theme toggle, and activity history — all from one panel.
-
-### 🗃️ Kanban Board
-Drag-and-drop across Todo / In Progress / Done columns using the native browser Drag and Drop API — no external library needed.
-
-### 📊 Analytics Dashboard
-Completion rate card, GitHub-style daily entry heatmap, category-wise completion chart, and status overview panel — all driven from localStorage data.
+### 🗃️ Board View (Kanban)
+- Three columns — **To Do / In Progress / Done**
+- Drag and drop tasks between columns using the native browser Drag and Drop API (no external library)
+- Dropping a card updates its status in Firestore in real time
+- Columns respect the active search, category, and status filters
 
 ### 🗓️ Calendar View
-Tasks plotted on a date-picker calendar by due date. Click any date to filter tasks due on that day.
+- Full month calendar with prev/next month navigation and a Today button
+- Each date cell shows tasks due on that day as colored dots
+- Tasks respect the active search and category filter
+- Click a date cell to see its tasks inline
 
-### 🕓 Activity History
-Creative chronological log of every add, edit, and delete event with timestamps and diff display.
+### 📊 Analytics Dashboard
+- **Completion rate** — radial SVG ring showing percentage of all tasks completed
+- **GitHub-style heatmap** — 28-day grid of task completions, intensity-coded by count
+- **Best day** — shows which day in the last 28 had the most completions
+- **Category breakdown** — horizontal bar chart for Finance / Study / Work / Other
+- **Status overview** — Total / Active / Completed / Overdue counts
 
-### 🎯 Smart Task Grouping
-Tasks grouped by due date with Today / Tomorrow labels, sorted chronologically. Within each group, high → mid → low priority order applied automatically.
+### 🕐 Activity History
+- Chronological log of every create, edit, complete, and delete event
+- Each entry shows the task name, category icon, priority icon, and a relative timestamp (e.g. "2h ago")
+- Filter history by action type — All / Created / Edited / Completed / Deleted
+- Clear history button with confirmation
+- Capped at 300 entries — oldest entries drop off automatically
 
-### 🔴 Overdue Detection
-`isOverdue()` checks `dueDate < now` for incomplete tasks — red card accent and overdue badge applied automatically.
+### 📁 Projects
+- Create projects with a name and one of 10 color labels
+- Rename a project inline — click the edit icon, type, press Enter
+- Delete a project — tasks are unassigned (not deleted), confirmed with a prompt
+- Each project shows a live task count and a color-coded progress bar (% completed)
+- Click a project in the sidebar to filter all views to that project only
+- Assign tasks to projects from the task form or task edit panel
 
-### 🎤 Voice Input
-Web Speech API with continuous and interim results. Stops on form submit or manually via button.
+### 📌 Pinned Tasks
+- Pin any task from the form or from the task card
+- All pinned tasks appear in the sidebar panel for quick access
+- Click a pinned task in the sidebar to jump straight to it
 
-### 📎 Attachment System
-Images (max 2MB) and files (max 5MB), up to 5 per task, stored as base64 in localStorage.
+### 🏷️ Tags
+- Add multiple #tags to any task
+- All unique tags appear in the sidebar Tags panel
+- Click a tag to filter the list view to only tasks with that tag
+- Tags are stored lowercase and deduplicated automatically
 
-### 🌙 Dark Mode
-All CSS tokens fully remapped for dark — not just inverted. Persists via localStorage with no flash on reload.
+### 🎯 Today Focus Mode
+- One click in the sidebar to show only tasks due today plus any overdue incomplete tasks
+- Works across List, Board, and Calendar views
 
----
+### ⏱️ Pomodoro Timer
+- Attach a focus timer to any task from the task card
+- 25-minute work session → 5-minute break, cycles automatically
+- Shows the active task name in the timer widget
+- Collapses to a bottom sheet on mobile screens
 
-## ♿ Accessibility (WCAG 2.x)
+### 🔍 Search & Filter
+- Debounced search bar — filters task name matches across all visible tasks
+- Status filter pills — All / Active / Completed / Overdue
+- Category dropdown filter — Finance / Study / Work / Other
+- All filters combine — search + status + category + project + tag all work together
 
-- **WCAG 2.4.1** — skip navigation link for keyboard users
-- **WCAG 2.4.7** — visible focus ring on every interactive element via `:focus-visible`
-- **WCAG 2.5.5** — minimum 40px touch targets on all inputs and buttons
-- **WCAG 1.4.1** — never color alone to convey meaning; double-encoded with icon + text
-- **WCAG 2.3.3** — `prefers-reduced-motion` disables all animations for motion-sensitive users
-- **WCAG 4.1.2** — `aria-label` on icon-only buttons; `aria-pressed`, `aria-selected`, `aria-live`, `role` attributes throughout
+### 📤 Export
+- **CSV** — exports all currently visible (filtered) tasks with name, due date, priority, category, completion status
+- **PDF** — landscape table with header row, data rows, and a summary (total / completed / active) at the bottom
+- PDF library (jsPDF) is loaded dynamically on demand — not included in the initial bundle
+- Export is blocked when a category filter is active (to prevent partial data confusion)
+
+### 🌙 Dark / Light Mode
+- Full dark mode — all CSS tokens remapped, not just inverted colors
+- Theme preference saved to the user's Firestore document — persists across devices and sessions
+- Toggle from the user menu in the sidebar footer
+
+### ♿ Accessibility
+- Skip navigation link for keyboard users (WCAG 2.4.1)
+- Visible focus ring on every interactive element via `:focus-visible` (WCAG 2.4.7)
+- Minimum 44px touch targets (WCAG 2.5.5)
+- Color never used alone to convey meaning — always paired with icon or text (WCAG 1.4.1)
+- `prefers-reduced-motion` disables all animations (WCAG 2.3.3)
+- `aria-label`, `aria-pressed`, `aria-selected`, `aria-live`, `role` used throughout (WCAG 4.1.2)
 - High contrast mode support via `forced-colors: active`
-
----
-
-## 🎨 UI/UX Design Principles
-
-### Visual Hierarchy
-- F-pattern layout — most important info anchored top-left
-- Progressive disclosure — card actions hidden until hover or focus
-- Gestalt proximity — related controls grouped in segmented containers
-- Redundant coding — completed tasks use strikethrough + muted color, not color alone
-- Semantic color system — red=danger, amber=warning, green=success, indigo=active
-
-### Design Token System
-- 4px spacing scale — all spacing is multiples of 4px
-- Full color palette with `-soft` 10–12% opacity variants for backgrounds
-- Typography scale — Syne (headings), DM Sans (body), JetBrains Mono (numbers/code)
-- Border-radius scale — xs/sm/md/lg/xl tokens throughout
-- CSS custom properties as single source of truth for every value
-
-### Motion & Animation
-- Purpose-driven animation only — every animation communicates state
-- `cubic-bezier(0.4, 0, 0.2, 1)` easing for entrances, `ease` for micro-interactions
-- Stagger animations — list items animate in sequence to convey hierarchy
-- Skeleton loading states — shows structure before content loads
-
-### Responsive Design
-- Mobile-first breakpoints — 480px, 640px, 768px, 900px
-- View tabs collapse to icon-only on small screens
-- Pomodoro widget becomes a bottom sheet on mobile
-- Calendar cells scale down gracefully
-- Print stylesheet — removes UI chrome, outputs clean task list
-
----
-
-## 🛡️ Error Handling Strategy
-
-```
-TodoItem throws during render
-↓
-JavaScript error fires
-↓
-ErrorBoundary wrapping TodoList catches it
-↓
-"Something went wrong ⚠️" fallback UI shown ✅
-
-
-User attaches file > 5MB (or image > 2MB)
-↓
-file.size > maxSize check fires
-↓
-File skipped silently in loop
-↓
-Other valid files still attach ✅
-
-
-User clicks Download PDF
-↓
-jsPDF CDN import or generation throws
-↓
-try/catch catches it
-↓
-"PDF download failed" alert shown ✅
-
-
-User clicks Download with no visible tasks
-↓
-filteredTodos.length === 0
-↓
-Early guard check fires
-↓
-"No visible todos to download" alert shown ✅
-```
 
 ---
 
 ## ⚙️ Key Engineering Decisions
 
-- **Context API** — centralized todos, filters, theme, projects, history; no prop drilling
-- **CSS Custom Properties** — full design token system, efficient dark mode remapping
-- **Native Drag and Drop API** — Kanban board without any external DnD library
-- **Debounced search** — 300ms debounce via `useRef` timer, avoids re-filter on every keystroke
-- **base64 attachments** — FileReader API stores images and files directly in localStorage
-- **Dynamic jsPDF import** — PDF library loaded on demand, not in the initial bundle
-- **Error Boundary** — isolates TodoList render crashes from the rest of the app
+| Decision | Reason |
+|---|---|
+| Firestore over localStorage | Real-time sync across devices, survives browser clears, no data loss |
+| Cloudinary for file attachments | Firestore has a 1MB per-document limit — storing images as base64 inline would silently corrupt user data |
+| `onSnapshot` for reads | Live updates with no polling — changes on one device appear instantly on all others |
+| Debounced Firestore writes (600ms) | Rapid state changes (e.g. typing) get batched into one write — avoids rate limits and unnecessary cost |
+| `skipNextSave` ref flag | Prevents the `onSnapshot` callback from immediately triggering a write back to Firestore (write-on-read bug) |
+| `TodoProvider` inside `AppContent` | Firestore subscription only initializes after a confirmed authenticated user exists — no wasted reads |
+| `crypto.randomUUID()` for all IDs | Guaranteed collision-free — `Date.now()` IDs can clash when React batches state updates in the same millisecond |
+| Re-auth before account delete | Firebase requires a fresh session for destructive operations — handled automatically via Google popup, no manual logout needed |
+| Dynamic jsPDF import | ~500KB PDF library only loads when the user actually clicks export, keeping the initial bundle lean |
+| Native HTML5 Drag and Drop | Full Kanban functionality with zero external drag-and-drop dependencies |
+| Error Boundary with reset button | Catches render crashes, offers in-place "Try again" recovery without forcing a full page reload |
+
+---
+
+## 📱 App Flow
+
+```
+Open app
+  → Firebase checks auth state
+  → Loading spinner while auth resolves
+
+Not logged in
+  → Login screen (Google / Email+Password / Register / Forgot Password)
+
+Logged in
+  → Firestore snapshot loads all user data in real time
+  → Skeleton cards shown while data arrives
+
+Sidebar
+  → 🎯 Today Focus  → tasks due today + overdue
+  → 📌 Pinned       → all pinned tasks
+  → 🏷️ Tags         → browse by #tag
+  → 📁 Projects     → create / rename / delete / switch projects
+  → 📊 Analytics    → dashboard overlay
+  → 🕐 History      → activity log
+
+Add task (list view form)
+  → name + date + time + priority + category + repeat + project
+  → voice input, subtasks, tags, notes, pin, file/image attach
+  → submit → Firestore write (debounced 600ms) → syncs everywhere
+
+Switch views
+  → Board    → drag tasks across To Do / In Progress / Done
+  → Calendar → browse tasks by month, see due dates on grid
+  → History  → filter and clear activity log
+
+Export
+  → CSV or PDF of currently filtered tasks
+
+User menu (sidebar footer)
+  → Switch dark / light theme
+  → Logout
+  → Delete account (with re-auth if needed)
+```
 
 ---
 
@@ -272,16 +216,34 @@ Early guard check fires
 git clone https://github.com/mayurpanchal-12/ReactTodo.git
 cd ReactTodo
 npm install
+```
+
+Create a `.env` file in the project root:
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+VITE_CLOUDINARY_CLOUD_NAME=
+VITE_CLOUDINARY_UPLOAD_PRESET=
+```
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:5173](http://localhost:5173)
 
 ---
 
-
 ## 🌐 Deployment
 
-Deployed on **Vercel** with automatic builds on push to `main`.
+Deployed on **Vercel** — auto-builds and deploys on every push to `main`.
+
+All `VITE_*` environment variables are set in Vercel → Project Settings → Environment Variables.
 
 Live: [https://react-todo-sage-phi.vercel.app/](https://react-todo-sage-phi.vercel.app/)

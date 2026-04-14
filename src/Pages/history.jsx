@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 
 const ACTION_MAP = {
   completed: { label: "Completed", cls: "completed", dot: "✓", color: "var(--green)" },

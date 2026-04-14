@@ -1,4 +1,5 @@
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
+
 
 export default function TodayFocusBtn({ onNavigate }) {
   const { todayFocus, setTodayFocus, todayCount, setFilter, setActiveTag } = useTodo();

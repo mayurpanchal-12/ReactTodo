@@ -1,4 +1,4 @@
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 
 export default function PinnedPanel({ onNavigate }) {
   const { pinnedTodos, togglePin, setFilter, setActiveTag, setTodayFocus } = useTodo();

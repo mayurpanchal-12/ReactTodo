@@ -1,27 +1,54 @@
 import { useState, useRef, useEffect } from "react";
-import TodoDownloadDropdown from "./download.jsx";
+import TodoDownloadDropdown from "./Components/download.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
-import FilterBar from "./filter.jsx";
-import { TodoProvider, useTodo } from "./todocontext.jsx";
-import TodoForm from "./todoform.jsx";
-import TodoItem from "./todoitem.jsx";
-import Dashboard from "./dashboard.jsx";
-import CalendarView from "./calendar.jsx";
-import BoardView from "./board.jsx";
-import PomodoroTimer from "./pomodoro.jsx";
-import HistoryView from "./history.jsx";
-import ProjectsPanel from "./projects.jsx";
+import FilterBar from "./Components/filter.jsx";
+import { TodoProvider, useTodo } from "./Context/todocontext.jsx"
 
-import TodayFocusBtn from "./todayfocus.jsx";
-import PinnedPanel from "./pinned.jsx";
-import TagsPanel from "./tagspanel.jsx";
+import TodoForm from "./Components/todoform.jsx";
+import TodoItem from "./Pages/todoitem.jsx";
+import Dashboard from "./Pages/dashboard.jsx";
+import CalendarView from "./Pages/calendar.jsx";
+import BoardView from "./Pages/board.jsx";
+import PomodoroTimer from "./Components/pomodoro.jsx";
+import HistoryView from "./Pages/history.jsx";
+import ProjectsPanel from "./Pages/projects.jsx";
+import TodayFocusBtn from "./Components/todayfocus.jsx";
+import PinnedPanel from "./Components/pinned.jsx";
+import TagsPanel from "./Components/tagspanel.jsx";
+import LoginPage from "./Pages/LoginPage.jsx";
+import { AuthProvider, useAuth } from "./Context/AuthContext.jsx";
+import UserPill from "./Components/UserPill.jsx";
+
+function PageLoader() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "var(--bg-app, #0f0f0f)",
+    }}>
+      <div style={{
+        width: 32, height: 32,
+        border: "3px solid rgba(255,255,255,0.1)",
+        borderTop: "3px solid var(--accent, #6366f1)",
+        borderRadius: "50%",
+        animation: "spin 0.7s linear infinite",
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 function TodoList() {
   const {
     groupedTodos, activeCount, completedCount, overdueCount, totalCount,
     filter, setFilter, theme, setTheme, categoryFilter, setCategoryFilter,
-    clearCompleted, projects, activeProject, setActiveProject,todayFocus, activeTag, 
+    clearCompleted, projects, activeProject, setActiveProject, todayFocus, activeTag,
+    loaded,
   } = useTodo();
+
+  const { user, logout } = useAuth();
 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showDashboard, setShowDashboard]               = useState(false);
@@ -52,6 +79,22 @@ function TodoList() {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, []);
+
+  const [installPrompt, setInstallPrompt] = useState(null);
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') setInstallPrompt(null);
+  };
 
   const handleCategorySelect = (cat) => {
     setCategoryFilter(categoryFilter === cat ? null : cat);
@@ -85,25 +128,17 @@ function TodoList() {
   };
 
   const completionRate = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
-
-  // Page title
   const activeProjectObj = projects.find(p => p.id === activeProject);
-  // const pageTitle = activeProjectObj
-  //   ? activeProjectObj.name
-  //   : categoryFilter
-  //     ? `${categoryIcons[categoryFilter]} ${categoryLabels[categoryFilter]}`
-  //     : { list: "All Tasks", board: "Board", calendar: "Calendar", history: "History" }[viewMode] || "All Tasks";
-
 
   const pageTitle = todayFocus
-  ? "📅 Today's Focus"
-  : activeTag
-    ? `🏷️ #${activeTag}`
-    : activeProjectObj
-      ? activeProjectObj.name
-      : categoryFilter
-        ? `${categoryIcons[categoryFilter]} ${categoryLabels[categoryFilter]}`
-        : { list: "All Tasks", board: "Board", calendar: "Calendar", history: "History" }[viewMode] || "All Tasks";
+    ? "📅 Today's Focus"
+    : activeTag
+      ? `🏷️ #${activeTag}`
+      : activeProjectObj
+        ? activeProjectObj.name
+        : categoryFilter
+          ? `${categoryIcons[categoryFilter]} ${categoryLabels[categoryFilter]}`
+          : { list: "All Tasks", board: "Board", calendar: "Calendar", history: "History" }[viewMode] || "All Tasks";
 
   useEffect(() => {
     document.title = `${pageTitle} | TaskFlow`;
@@ -111,17 +146,14 @@ function TodoList() {
 
   return (
     <div className="app-bg">
-      {/* UX: Skip navigation link — keyboard users can jump to content (WCAG 2.4.1) */}
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
-      {/* ── Sidebar Overlay ── */}
       <div
         className={`sidebar-overlay ${sidebarOpen ? "visible" : ""}`}
         onClick={() => setSidebarOpen(false)}
         aria-hidden="true"
       />
 
-      {/* ── Sidebar ── */}
       <aside
         className={`app-sidebar ${sidebarOpen ? "open" : ""}`}
         aria-label="Navigation sidebar"
@@ -130,86 +162,63 @@ function TodoList() {
       >
         <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>×</button>
 
-<div className="sidebar-logo">
-  <div className="sidebar-logo-icon">✓</div>
-  Task<span>Flow</span>
-</div>
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">✓</div>
+          Task<span>Flow</span>
+        </div>
 
-{/* Quick Add */}
-<button
-  className="sidebar-quick-add"
-  onClick={() => {
-    setViewMode("list");
-    setActiveProject(null);
-    setSidebarOpen(false);
-    setTimeout(() => document.querySelector(".form-input-text")?.focus(), 150);
-  }}
->
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>
-  New Task
-</button>
+        <button
+          className="sidebar-quick-add"
+          onClick={() => {
+            setViewMode("list");
+            setActiveProject(null);
+            setSidebarOpen(false);
+            setTimeout(() => document.querySelector(".form-input-text")?.focus(), 150);
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          New Task
+        </button>
 
-{/* Today's Focus */}
-<div className="sidebar-section-label">Focus</div>
-<TodayFocusBtn onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+        <div className="sidebar-section-label">Focus</div>
+        <TodayFocusBtn onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
 
-{/* Pinned Tasks */}
-<div className="sidebar-section-label">Pinned</div>
-<PinnedPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+        <div className="sidebar-section-label">Pinned</div>
+        <PinnedPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
 
-{/* Tags */}
-<div className="sidebar-section-label">Tags</div>
-<TagsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+        <div className="sidebar-section-label">Tags</div>
+        <TagsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
 
-<div className="sidebar-divider" />
+        <div className="sidebar-divider" />
 
-{/* Projects */}
-<div className="sidebar-section-label">Projects</div>
-<ProjectsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
+        <div className="sidebar-section-label">Projects</div>
+        <ProjectsPanel onNavigate={() => { setViewMode("list"); setSidebarOpen(false); }} />
 
-<div className="sidebar-divider" />
+        <div className="sidebar-divider" />
 
-{/* Bottom nav */}
-<nav className="sidebar-nav">
-  <button className="sidebar-nav-item" onClick={() => { setShowDashboard(true); setSidebarOpen(false); }}>
-    <span className="nav-icon">📊</span>
-    Analytics
-  </button>
-  <button
-    className={`sidebar-nav-item ${viewMode === "history" ? "active" : ""}`}
-    onClick={() => { setViewMode("history"); setSidebarOpen(false); }}
-  >
-    <span className="nav-icon">🕐</span>
-    Activity History
-  </button>
-</nav>
+        <nav className="sidebar-nav">
+          <button className="sidebar-nav-item" onClick={() => { setShowDashboard(true); setSidebarOpen(false); }}>
+            <span className="nav-icon">📊</span>
+            Analytics
+          </button>
+          <button
+            className={`sidebar-nav-item ${viewMode === "history" ? "active" : ""}`}
+            onClick={() => { setViewMode("history"); setSidebarOpen(false); }}
+          >
+            <span className="nav-icon">🕐</span>
+            Activity History
+          </button>
+        </nav>
 
-<div className="sidebar-footer">
-  <span className="sidebar-footer-label">Theme</span>
-  <button className="theme-btn" onClick={() => setTheme(isDark ? "light" : "dark")}>
-    {isDark ? (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    ) : (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-    )}
-  </button>
-</div>
+        <div className="sidebar-footer">
+          <UserPill/>
+        </div>
       </aside>
 
-      {/* ── Main Content ── */}
       <main className="app-main" id="main-content">
 
-        {/* ── Top Bar ── */}
         <header className="topbar" role="banner">
           <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen(true)} aria-label="Open navigation sidebar" aria-expanded={sidebarOpen} aria-controls="app-sidebar">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -224,7 +233,6 @@ function TodoList() {
             TaskFlow
           </div>
 
-          {/* Page title + active project badge */}
           <div className="topbar-title">
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               {activeProjectObj && (
@@ -240,7 +248,6 @@ function TodoList() {
             </div>
           </div>
 
-          {/* View Tabs */}
           <div className="view-tabs" role="tablist" aria-label="View modes">
             {[
               { id: "list",     label: "List",     icon: "☰" },
@@ -279,36 +286,99 @@ function TodoList() {
 
         {/* ── Quick Stats Bar ── */}
         <div className="quickstats" role="region" aria-label="Task statistics">
+
           <div className="quickstat-item accent">
-            <span className="quickstat-num">{totalCount}</span>
-            <span className="quickstat-label">Total<br />Tasks</span>
+            <div className="quickstat-icon">
+              <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <div className="quickstat-info">
+              <span className="quickstat-num">{totalCount}</span>
+              <span className="quickstat-label">Total Tasks</span>
+            </div>
           </div>
+
           <div className="quickstat-sep" />
+
           <div className="quickstat-item indigo">
-            <span className="quickstat-num">{activeCount}</span>
-            <span className="quickstat-label">Active<br />Tasks</span>
+            <div className="quickstat-icon">
+              <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div className="quickstat-info">
+              <span className="quickstat-num">{activeCount}</span>
+              <span className="quickstat-label">Active Tasks</span>
+            </div>
           </div>
+
           <div className="quickstat-sep" />
+
           <div className="quickstat-item green">
-            <span className="quickstat-num">{completedCount}</span>
-            <span className="quickstat-label">Completed<br />Tasks</span>
+            <div className="quickstat-icon">
+              <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="quickstat-info">
+              <span className="quickstat-num">{completedCount}</span>
+              <span className="quickstat-label">Completed</span>
+            </div>
           </div>
+
           <div className="quickstat-sep" />
+
           <div className="quickstat-item red">
-            <span className="quickstat-num">{overdueCount}</span>
-            <span className="quickstat-label">Overdue<br />Tasks</span>
+            <div className="quickstat-icon">
+              <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="quickstat-info">
+              <span className="quickstat-num">{overdueCount}</span>
+              <span className="quickstat-label">Overdue</span>
+            </div>
           </div>
+
           {activeProjectObj && (
             <>
               <div className="quickstat-sep" />
               <div className="quickstat-item" style={{ "--c": activeProjectObj.color }}>
-                <span className="quickstat-num" style={{ color: activeProjectObj.color }}>
-                  {Math.round((completedCount / (totalCount || 1)) * 100)}%
-                </span>
-                <span className="quickstat-label">Project<br />Progress</span>
+                <div className="quickstat-icon" style={{ background: activeProjectObj.color + "22" }}>
+                  <svg fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor" style={{ stroke: activeProjectObj.color }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div className="quickstat-info">
+                  <span className="quickstat-num" style={{ color: activeProjectObj.color }}>
+                    {Math.round((completedCount / (totalCount || 1)) * 100)}%
+                  </span>
+                  <span className="quickstat-label">Project Progress</span>
+                </div>
               </div>
             </>
           )}
+
+          {installPrompt && (
+            <>
+              <div className="quickstat-sep" />
+              <div className="quickstat-item" onClick={handleInstall} style={{ cursor: 'pointer' }}>
+                <div className="quickstat-icon" style={{ background: 'var(--accent-soft)' }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round">
+                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <div className="quickstat-info">
+                  <span className="quickstat-num" style={{ color: 'var(--accent)', fontSize: '0.75rem' }}>
+                    Install
+                  </span>
+                  <span className="quickstat-label">Add to device</span>
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="progress-bar-wrap">
             <span className="progress-label">{completionRate}%</span>
             <div className="progress-bar-track">
@@ -316,12 +386,11 @@ function TodoList() {
             </div>
             <span className="progress-label" style={{ fontSize: "0.64rem", opacity: 0.6 }}>done</span>
           </div>
+
         </div>
 
-        {/* ── Main scrollable area ── */}
         <div className="main-inner">
 
-          {/* Filter pills — list view only */}
           {viewMode === "list" && (
             <div className="stats-row">
               {[
@@ -339,7 +408,6 @@ function TodoList() {
                 </button>
               ))}
 
-              {/* Category dropdown */}
               <div style={{ position: "relative" }} ref={categoryDropdownRef}>
                 <button
                   className={`stats-pill ${categoryFilter ? "pill-active-category" : ""}`}
@@ -387,14 +455,23 @@ function TodoList() {
             </div>
           )}
 
-          {/* Search */}
           {(viewMode === "list" || viewMode === "board") && <FilterBar />}
-
-          {/* Add Task Form */}
           {viewMode === "list" && <TodoForm />}
 
-          {/* ── Views ── */}
-          {viewMode === "list" && (
+          {viewMode === "list" && !loaded && (
+            <div className="todo-groups">
+              {[1,2,3].map(i => (
+                <div key={i} className="todo-group" style={{ marginBottom: "1rem" }}>
+                  <div style={{ height: 14, width: 120, borderRadius: 6, background: "var(--bg-surface-2)", marginBottom: "0.75rem", opacity: 0.5 }} />
+                  {[1,2].map(j => (
+                    <div key={j} style={{ height: 56, borderRadius: 10, background: "var(--bg-surface-2)", marginBottom: "0.5rem", opacity: 0.4 }} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {viewMode === "list" && loaded && (
             <div className="todo-groups animate-fade-in">
               {groupedTodos.length === 0 ? (
                 <div className="empty-state" role="status" aria-live="polite">
@@ -437,12 +514,23 @@ function TodoList() {
   );
 }
 
-export default function App() {
+function AppContent() {
+  const { user } = useAuth();
+  if (user === undefined) return <PageLoader />;
+  if (!user) return <LoginPage />;
   return (
     <TodoProvider>
-      <ErrorBoundary>
-        <TodoList />
-      </ErrorBoundary>
+      <TodoList />
     </TodoProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <ErrorBoundary>
+        <AppContent />
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }

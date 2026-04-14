@@ -1,4 +1,4 @@
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 
 export default function Dashboard({ onClose }) {
   const { todos, completedCount, totalCount, overdueCount } = useTodo();

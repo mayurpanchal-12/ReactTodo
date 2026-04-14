@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 
 const COLORS = [
   "#6366f1", "#e8621a", "#16a34a", "#dc2626",

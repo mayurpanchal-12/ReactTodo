@@ -1,14 +1,20 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { db } from '../firebase';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { useAuth } from './AuthContext';
 
 const TodoContext = createContext();
 export const useTodo = () => useContext(TodoContext);
 
 export const TodoProvider = ({ children }) => {
+  const { user } = useAuth();
+  const [loaded, setLoaded] = useState(false);
+
   const [todos, setTodos]                       = useState([]);
   const [filter, setFilter]                     = useState('all');
   const [searchInput, setSearchInput]           = useState('');
   const [searchQuery, setSearchQuery]           = useState('');
-  const [theme, setTheme]                       = useState('dark');
+  const [theme, setTheme]                       = useState('light');
   const [categoryFilter, setCategoryFilter]     = useState(null);
   const [activePomodoroId, setActivePomodoroId] = useState(null);
   const [history, setHistory]                   = useState([]);
@@ -21,6 +27,59 @@ export const TodoProvider = ({ children }) => {
   const todosRef = useRef(todos);
   useEffect(() => { todosRef.current = todos; }, [todos]);
 
+   const skipNextSave = useRef(false);
+
+  // ── Firestore: load on login ───────────────────────
+  useEffect(() => {
+    if (!user) {
+      // reset everything on logout
+      setTodos([]);
+      setHistory([]);
+      setProjects([]);
+      setPinnedIds([]);
+      setTheme('dark');
+      setLoaded(false);
+      return;
+    }
+
+    const userDoc = doc(db, 'users', user.uid);
+    const unsub = onSnapshot(userDoc, (snap) => {
+        skipNextSave.current = true;  
+
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.todos) setTodos(data.todos.map(t => ({
+          priority: 'mid', category: 'other', attachments: [],
+          subtasks: [], repeat: 'none', completedAt: null,
+          description: '', projectId: null, tags: [],
+          ...t,
+          status: t.status || (t.completed ? 'completed' : 'todo'),
+        })));
+        if (data.history)   setHistory(data.history);
+        if (data.projects)  setProjects(data.projects);
+        if (data.pinnedIds) setPinnedIds(data.pinnedIds);
+        if (data.theme)     setTheme(data.theme);
+      }
+      setLoaded(true);
+    });
+
+   
+
+
+    return unsub;
+  }, [user]);
+
+  // ── Firestore: save on change ──────────────────────
+useEffect(() => {
+     if (!user || !loaded) return;
+     if (skipNextSave.current) { skipNextSave.current = false; return; }
+     const userDoc = doc(db, 'users', user.uid);
+     const timer = setTimeout(() => {
+       setDoc(userDoc, { todos, history, projects, pinnedIds, theme }, { merge: true });
+     }, 600);
+     return () => clearTimeout(timer);
+   }, [todos, history, projects, pinnedIds, theme]);
+  // ── Helpers ───────────────────────────────────────
   const isOverdue = (todo) => {
     if (!todo.dueDate || todo.completed) return false;
     return new Date(todo.dueDate) < new Date();
@@ -29,7 +88,8 @@ export const TodoProvider = ({ children }) => {
 
   const pushHistory = (action, todo) => {
     setHistory(prev => [{
-      id: Date.now() + Math.random(),
+      id: crypto.randomUUID(),
+
       action, taskName: todo.todo, taskId: todo.id,
       category: todo.category, priority: todo.priority,
       projectId: todo.projectId || null,
@@ -37,8 +97,9 @@ export const TodoProvider = ({ children }) => {
     }, ...prev].slice(0, 300));
   };
 
+  // ── Projects ──────────────────────────────────────
   const addProject = (name, color) => {
-    setProjects(prev => [...prev, { id: Date.now(), name, color, createdAt: new Date().toISOString() }]);
+    setProjects(prev => [...prev, { id: crypto.randomUUID(), name, color, createdAt: new Date().toISOString() }]);
   };
   const deleteProject = (id) => {
     setProjects(prev => prev.filter(p => p.id !== id));
@@ -49,10 +110,12 @@ export const TodoProvider = ({ children }) => {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
   };
 
+  // ── Pins ──────────────────────────────────────────
   const togglePin = (id) => {
     setPinnedIds(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
   };
 
+  // ── Tags ──────────────────────────────────────────
   const addTagToTodo = (id, tag) => {
     setTodos(prev => prev.map(t =>
       t.id === id ? { ...t, tags: [...new Set([...(t.tags || []), tag.toLowerCase().trim()])] } : t
@@ -64,18 +127,19 @@ export const TodoProvider = ({ children }) => {
     ));
   };
 
+  // ── CRUD ──────────────────────────────────────────
   const addTodo = (todoData) => {
     const newTodo = {
-      id: Date.now(), priority: 'mid', category: 'other',
+      id: crypto.randomUUID(), priority: 'mid', category: 'other',
       attachments: [], subtasks: [], repeat: 'none',
       completedAt: null, description: '', status: 'todo',
       projectId: activeProject || null, tags: [],
       ...todoData,
     };
     setTodos(prev => [...prev, newTodo]);
-     if (todoData.pinned) {
-    setPinnedIds(prev => [...prev, newTodo.id]);  // 👈 add this
-  }
+    if (todoData.pinned) {
+      setPinnedIds(prev => [...prev, newTodo.id]);
+    }
     pushHistory('created', newTodo);
   };
 
@@ -110,7 +174,7 @@ export const TodoProvider = ({ children }) => {
           if (todo.repeat === 'daily')   nextDate.setDate(nextDate.getDate() + 1);
           if (todo.repeat === 'weekly')  nextDate.setDate(nextDate.getDate() + 7);
           if (todo.repeat === 'monthly') nextDate.setMonth(nextDate.getMonth() + 1);
-          newTodos.push({ ...todo, id: Date.now() + Math.random(), completed: false, status: 'todo', completedAt: null, dueDate: nextDate.toISOString().slice(0, 16) });
+          newTodos.push({ ...todo, id: crypto.randomUUID(), completed: false, status: 'todo', completedAt: null, dueDate: nextDate.toISOString().slice(0, 16) });
         }
       }
       if (isBecomingComplete) pushHistory('completed', todo);
@@ -133,36 +197,7 @@ export const TodoProvider = ({ children }) => {
     setPinnedIds(prev => prev.filter(id => !completedIds.includes(id)));
   };
 
-  // Persistence
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('todos') || '[]');
-      if (stored.length) {
-        setTodos(stored.map(t => ({
-          priority: 'mid', category: 'other', attachments: [], subtasks: [],
-          repeat: 'none', completedAt: null, description: '', projectId: null, tags: [],
-          ...t,
-          status: t.status || (t.completed ? 'completed' : 'todo'),
-        })));
-      }
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) setTheme(savedTheme);
-      const savedHistory = JSON.parse(localStorage.getItem('taskHistory') || '[]');
-      if (savedHistory.length) setHistory(savedHistory);
-      const savedProjects = JSON.parse(localStorage.getItem('projects') || '[]');
-      if (savedProjects.length) setProjects(savedProjects);
-      const savedPinned = JSON.parse(localStorage.getItem('pinnedIds') || '[]');
-      if (savedPinned.length) setPinnedIds(savedPinned);
-    } catch (e) { console.error('Load error', e); }
-  }, []);
-
-  useEffect(() => { localStorage.setItem('todos', JSON.stringify(todos)); }, [todos]);
-  useEffect(() => { localStorage.setItem('theme', theme); }, [theme]);
-  useEffect(() => { localStorage.setItem('taskHistory', JSON.stringify(history)); }, [history]);
-  useEffect(() => { localStorage.setItem('projects', JSON.stringify(projects)); }, [projects]);
-  useEffect(() => { localStorage.setItem('pinnedIds', JSON.stringify(pinnedIds)); }, [pinnedIds]);
-
-  // Filtering
+  // ── Filtering ─────────────────────────────────────
   const filteredTodos = todos.filter(t => {
     if (activeProject !== null && t.projectId !== activeProject) return false;
     if (todayFocus) {
@@ -229,6 +264,7 @@ export const TodoProvider = ({ children }) => {
       allTags, activeTag, setActiveTag,
       addTagToTodo, removeTagFromTodo,
       todayFocus, setTodayFocus, todayCount,
+      loaded,
     }}>
       {children}
     </TodoContext.Provider>

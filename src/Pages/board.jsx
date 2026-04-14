@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 import TodoItem from "./todoitem";
 
 export default function BoardView() {

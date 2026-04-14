@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useTodo } from "./todocontext";
+import { useTodo } from "../Context/todocontext";
 
 export default function TodoForm() {
   const { addTodo, projects, activeProject } = useTodo();
+  const [uploading, setUploading] = useState(false);
 
   const [text,         setText]         = useState("");
   const [dueDate,      setDueDate]      = useState("");
@@ -33,6 +34,9 @@ export default function TodoForm() {
   const MAX_IMAGE_SIZE  = 2 * 1024 * 1024;
   const MAX_FILE_SIZE   = 5 * 1024 * 1024;
 
+  const CLOUDINARY_CLOUD_NAME   = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
   const priorityConfig = {
     low:  { icon: "🟢", label: "Low",    color: "var(--green)"  },
     mid:  { icon: "🟡", label: "Medium", color: "var(--amber)"  },
@@ -46,6 +50,7 @@ export default function TodoForm() {
     other:   { icon: "📝", label: "Other"   },
   };
 
+  // ── Voice input ───────────────────────────────────
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -60,6 +65,9 @@ export default function TodoForm() {
       recognitionRef.current.onerror = () => setIsListening(false);
       recognitionRef.current.onend   = () => setIsListening(false);
     }
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.abort();
+    };
   }, []);
 
   const startListening = () => { if (recognitionRef.current && !isListening) { recognitionRef.current.start(); setIsListening(true); } };
@@ -73,21 +81,33 @@ export default function TodoForm() {
     return Math.round((b / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
+  // ── Cloudinary upload ─────────────────────────────
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files);
     if (attachments.length + files.length > MAX_ATTACHMENTS) { e.target.value = ""; return; }
+    setUploading(true);
     const next = [];
     for (const file of files) {
       const isImg = isImageFile(file);
       if (file.size > (isImg ? MAX_IMAGE_SIZE : MAX_FILE_SIZE)) continue;
-      const data = await new Promise(res => {
-        const r = new FileReader();
-        r.onload = () => res({ name: file.name, type: file.type, size: file.size, data: r.result, isImage: isImg });
-        r.readAsDataURL(file);
-      });
-      next.push(data);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
+          { method: "POST", body: formData }
+        );
+        const data = await res.json();
+        if (data.secure_url) {
+          next.push({ name: file.name, type: file.type, size: file.size, url: data.secure_url, isImage: isImg });
+        }
+      } catch (err) {
+        console.error("Upload failed for", file.name, err);
+      }
     }
     setAttachments(prev => [...prev, ...next]);
+    setUploading(false);
     e.target.value = "";
   };
 
@@ -121,7 +141,7 @@ export default function TodoForm() {
 
   const addSubtask = () => {
     if (newSubtask.trim()) {
-      setSubtasks([...subtasks, { id: Date.now(), text: newSubtask.trim(), completed: false }]);
+      setSubtasks([...subtasks, { id: crypto.randomUUID(), text: newSubtask.trim(), completed: false }]);
       setNewSubtask("");
     }
   };
@@ -139,7 +159,7 @@ export default function TodoForm() {
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder="What needs to be done?"
-            className="tf-text-input"
+            className="tf-text-input form-input-text"
             aria-label="Task name"
             required
           />
@@ -165,12 +185,18 @@ export default function TodoForm() {
           </button>
         </div>
 
-        <button type="submit" className="tf-submit-btn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Add Task
+        <button type="submit" className="tf-submit-btn" disabled={uploading}>
+          {uploading ? (
+            "Uploading..."
+          ) : (
+            <>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Task
+            </>
+          )}
         </button>
       </div>
 
@@ -473,7 +499,7 @@ export default function TodoForm() {
           {attachments.map((a, i) => (
             <div key={i} className="tf-attachment-thumb">
               {a.isImage ? (
-                <img src={a.data} alt={a.name} />
+                <img src={a.url} alt={a.name} />
               ) : (
                 <div className="tf-attachment-file">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">

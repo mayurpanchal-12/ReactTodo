@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useTodo } from "./todocontext";
-import { TodoItemAttachmentsEdit, TodoItemAttachmentsView } from "./todoitemattachments";
+import { useTodo } from "../Context/todocontext";
+import { TodoItemAttachmentsEdit, TodoItemAttachmentsView } from "../Components/todoitemattachments";
 export default function TodoItem({ todo }) {
   const {
     updateTodo, deleteTodo, toggleComplete, isOverdue, theme,

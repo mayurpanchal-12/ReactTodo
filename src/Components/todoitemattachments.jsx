@@ -1,20 +1,11 @@
 export function TodoItemAttachmentsView({ attachments }) {
   if (!attachments?.length) return null;
 
-  const openAttachment = async (attachment) => {
-    try {
-      const res  = await fetch(attachment.data);
-      const blob = await res.blob();
-      const url  = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch {
-      const a = document.createElement("a");
-      a.href = attachment.data;
-      a.download = attachment.name;
-      a.click();
-    }
-  };
+  
 
+   const openAttachment = (attachment) => {
+     window.open(attachment.url, "_blank");
+   };
   return (
     <div className="card-attachments">
       <div className="card-attach-label">
@@ -29,7 +20,7 @@ export function TodoItemAttachmentsView({ attachments }) {
             title={a.name}
           >
             {a.isImage ? (
-              <img src={a.data} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              <img src={a.url} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
             ) : (
               <div className="card-attach-file">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
@@ -114,7 +105,7 @@ export function TodoItemAttachmentsEdit({
           {attachments.map((a, i) => (
             <div key={i} className="card-attach-item" style={{ position:"relative" }}>
               {a.isImage ? (
-                <img src={a.data} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <img src={a.url} alt={a.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
               ) : (
                 <div className="card-attach-file">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
