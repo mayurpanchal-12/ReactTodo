@@ -19,6 +19,8 @@ import LoginPage from "./Pages/LoginPage.jsx";
 import { AuthProvider, useAuth } from "./Context/AuthContext.jsx";
 import UserPill from "./Components/UserPill.jsx";
 
+import About from "./Pages/About.jsx";
+
 function PageLoader() {
   return (
     <div style={{
@@ -49,7 +51,7 @@ function TodoList() {
   } = useTodo();
 
   const { user, logout } = useAuth();
-
+  const [showAbout, setShowAbout] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showDashboard, setShowDashboard]               = useState(false);
   const [viewMode, setViewMode]                         = useState("list");
@@ -82,6 +84,11 @@ function TodoList() {
 
   const [installPrompt, setInstallPrompt] = useState(null);
   useEffect(() => {
+    // Event may have already fired before React mounted — grab it if so
+    if (window.__installPromptEvent) {
+      setInstallPrompt(window.__installPromptEvent);
+      window.__installPromptEvent = null;
+    }
     const handler = (e) => {
       e.preventDefault();
       setInstallPrompt(e);
@@ -210,6 +217,14 @@ function TodoList() {
             <span className="nav-icon">🕐</span>
             Activity History
           </button>
+
+          <button
+  className="sidebar-nav-item"
+  onClick={() => { setShowAbout(true); setSidebarOpen(false); }}
+>
+  <span className="nav-icon">ℹ️</span>
+  About
+</button>
         </nav>
 
         <div className="sidebar-footer">
@@ -250,10 +265,10 @@ function TodoList() {
 
           <div className="view-tabs" role="tablist" aria-label="View modes">
             {[
-              { id: "list",     label: "List",     icon: "☰" },
-              { id: "board",    label: "Board",    icon: "⊞" },
-              { id: "calendar", label: "Calendar", icon: "📅" },
-              { id: "history",  label: "History",  icon: "🕐" },
+              { id: "list",     label: <span>List</span>,     icon: "☰" },
+              { id: "board",    label: <span>Board</span>,    icon: "⊞" },
+             { id: "calendar", label: <span>Calendar</span>, icon: "📅" },
+             { id: "history",  label: <span>History</span>,  icon: "🕐" },
             ].map(v => (
               <button
                 key={v.id}
@@ -508,7 +523,8 @@ function TodoList() {
         </div>
       </main>
 
-      {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
+        {showDashboard && <Dashboard onClose={() => setShowDashboard(false)} />}
+{showAbout    && <About     onClose={() => setShowAbout(false)}    />}
       <PomodoroTimer />
     </div>
   );

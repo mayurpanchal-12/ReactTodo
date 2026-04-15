@@ -8,7 +8,7 @@
 
 ---
 
-A **production-grade cloud task management SPA** built with React 18, Firebase Auth, Firestore, and Cloudinary. Every piece of your data lives in the cloud — open the app on two devices and watch changes appear instantly in real time.
+A **production-grade cloud task management Responsive SPA** built with React 18, Firebase Auth, Firestore, and Cloudinary. Every piece of your data lives in the cloud — open the app on two devices and watch changes appear instantly in real time.
 
 ---
 
@@ -26,14 +26,15 @@ A **production-grade cloud task management SPA** built with React 18, Firebase A
 
 | Layer | Technology |
 |---|---|
-| UI | React 18, CSS Custom Properties, Vite |
+| UI | React 18, CSS Custom Properties, Tailwind Css , Vite |
 | Auth | Firebase Authentication (Google + Email/Password) |
 | Database | Cloud Firestore (real-time sync) |
 | File Storage | Cloudinary (direct browser uploads) |
-| Deployment | Vercel (auto-deploy on push) |
+| Deployment | Vercel deployment|
 | Export | jsPDF (dynamic import), native CSV |
 | Voice | Web Speech API |
 | Drag & Drop | Native HTML5 Drag and Drop API |
+|PWA | install via PWA funtionality
 
 ---
 
@@ -147,6 +148,11 @@ A **production-grade cloud task management SPA** built with React 18, Firebase A
 - `aria-label`, `aria-pressed`, `aria-selected`, `aria-live`, `role` used throughout (WCAG 4.1.2)
 - High contrast mode support via `forced-colors: active`
 
+### PWA 
+ - Supports installation using Progressive Web App (PWA) capabilities
+
+### Responsive 
+  - responsive to all major screen sizeses
 ---
 
 ## ⚙️ Key Engineering Decisions
@@ -164,51 +170,9 @@ A **production-grade cloud task management SPA** built with React 18, Firebase A
 | Dynamic jsPDF import | ~500KB PDF library only loads when the user actually clicks export, keeping the initial bundle lean |
 | Native HTML5 Drag and Drop | Full Kanban functionality with zero external drag-and-drop dependencies |
 | Error Boundary with reset button | Catches render crashes, offers in-place "Try again" recovery without forcing a full page reload |
-
+|About  | complete information of application
 ---
 
-## 📱 App Flow
-
-```
-Open app
-  → Firebase checks auth state
-  → Loading spinner while auth resolves
-
-Not logged in
-  → Login screen (Google / Email+Password / Register / Forgot Password)
-
-Logged in
-  → Firestore snapshot loads all user data in real time
-  → Skeleton cards shown while data arrives
-
-Sidebar
-  → 🎯 Today Focus  → tasks due today + overdue
-  → 📌 Pinned       → all pinned tasks
-  → 🏷️ Tags         → browse by #tag
-  → 📁 Projects     → create / rename / delete / switch projects
-  → 📊 Analytics    → dashboard overlay
-  → 🕐 History      → activity log
-
-Add task (list view form)
-  → name + date + time + priority + category + repeat + project
-  → voice input, subtasks, tags, notes, pin, file/image attach
-  → submit → Firestore write (debounced 600ms) → syncs everywhere
-
-Switch views
-  → Board    → drag tasks across To Do / In Progress / Done
-  → Calendar → browse tasks by month, see due dates on grid
-  → History  → filter and clear activity log
-
-Export
-  → CSV or PDF of currently filtered tasks
-
-User menu (sidebar footer)
-  → Switch dark / light theme
-  → Logout
-  → Delete account (with re-auth if needed)
-```
-
----
 
 ## ▶️ Getting Started
 
