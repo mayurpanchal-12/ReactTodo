@@ -35,13 +35,11 @@ export function AuthProvider({ children }) {
     setIsDeleting(true);
     try {
       await deleteUser(currentUser);
-      // user state will auto-update to null via onAuthStateChanged
     } catch (err) {
      if (err.code === 'auth/requires-recent-login') {
        try {
          await reauthenticateWithPopup(currentUser, googleProvider);
          await deleteUser(currentUser);
-         // success — onAuthStateChanged auto-sets user to null
        } catch (reAuthErr) {
          setIsDeleting(false);
          throw reAuthErr;

@@ -4,12 +4,10 @@ export default function PinnedPanel({ onNavigate }) {
   const { pinnedTodos, togglePin, setFilter, setActiveTag, setTodayFocus } = useTodo();
 
   const handlePinnedClick = (todo) => {
-    // Clear other filters so the task is visible
     setFilter("all");
     setActiveTag(null);
     setTodayFocus(false);
     onNavigate?.();
-    // Scroll to the task after a short delay for view to render
     setTimeout(() => {
       const el = document.getElementById(`todo-${todo.id}`);
       if (el) {

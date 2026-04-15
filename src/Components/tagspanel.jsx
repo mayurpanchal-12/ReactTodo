@@ -6,7 +6,6 @@ const TAG_COLORS = [
   "#d97706","#0d9488","#7c3aed","#ec4899",
 ];
 
-// Deterministic color per tag name
 const getTagColor = (tag) =>
   TAG_COLORS[tag.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % TAG_COLORS.length];
 

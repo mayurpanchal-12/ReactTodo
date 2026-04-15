@@ -16,9 +16,6 @@ export default function LoginPage() {
   const [success, setSuccess]               = useState('');
   const [loading, setLoading]               = useState(false);
 
-  // No useNavigate, no useEffect redirect needed.
-  // When login succeeds → Firebase fires onAuthStateChanged → AuthContext sets user
-  // → AppContent in App.jsx re-renders → <TodoList /> shows automatically.
 
   const validateEmail    = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const validatePassword = (v) => v.length >= 6;
@@ -50,7 +47,6 @@ export default function LoginPage() {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      // No navigate() needed — AppContent handles redirect automatically
     } catch (err) {
       setError(getFirebaseError(err.code));
     } finally {
@@ -62,7 +58,6 @@ export default function LoginPage() {
     setError(''); setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      // No navigate() needed — AppContent handles redirect automatically
     } catch (err) {
       setError(getFirebaseError(err.code));
     } finally {
@@ -195,7 +190,6 @@ export default function LoginPage() {
   );
 }
 
-// ── Styles — uses your app's CSS variables so dark mode works automatically ──
 const styles = {
   page: {
     minHeight: '100vh',

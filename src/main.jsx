@@ -6,7 +6,6 @@ import { registerSW } from 'virtual:pwa-register'
 
 registerSW({ immediate: true })
 
-// Capture beforeinstallprompt early, before React mounts
 window.__installPromptEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();

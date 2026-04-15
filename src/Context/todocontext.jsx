@@ -29,10 +29,8 @@ export const TodoProvider = ({ children }) => {
 
    const skipNextSave = useRef(false);
 
-  // ── Firestore: load on login ───────────────────────
   useEffect(() => {
     if (!user) {
-      // reset everything on logout
       setTodos([]);
       setHistory([]);
       setProjects([]);
@@ -127,21 +125,6 @@ useEffect(() => {
     ));
   };
 
-  // ── CRUD ──────────────────────────────────────────
-  // const addTodo = (todoData) => {
-  //   const newTodo = {
-  //     id: crypto.randomUUID(), priority: 'mid', category: 'other',
-  //     attachments: [], subtasks: [], repeat: 'none',
-  //     completedAt: null, description: '', status: 'todo',
-  //     projectId: activeProject || null, tags: [],
-  //     ...todoData,
-  //   };
-  //   setTodos(prev => [...prev, newTodo]);
-  //   if (todoData.pinned) {
-  //     setPinnedIds(prev => [...prev, newTodo.id]);
-  //   }
-  //   pushHistory('created', newTodo);
-  // };
 
 
 const addTodo = (todoData) => {
@@ -165,32 +148,7 @@ const addTodo = (todoData) => {
     setPinnedIds(prev => prev.filter(p => p !== id));
   };
 
-  // const updateTaskStatus = (id, newStatus) => {
-  //   setTodos(prev => {
-  //     const todo = prev.find(t => t.id === id);
-  //     if (!todo) return prev;
-  //     const currentStatus = todo.status || (todo.completed ? 'completed' : 'todo');
-  //     if (currentStatus === newStatus) return prev;
-  //     const isBecomingComplete = newStatus === 'completed';
-  //     let newTodos = prev.map(t => t.id === id ? {
-  //       ...t, status: newStatus,
-  //       completed: isBecomingComplete,
-  //       completedAt: isBecomingComplete ? new Date().toISOString() : null,
-  //     } : t);
-  //     if (isBecomingComplete && !todo.completed && todo.repeat && todo.repeat !== 'none' && todo.dueDate) {
-  //       const nextDate = new Date(todo.dueDate);
-  //       if (!isNaN(nextDate)) {
-  //         if (todo.repeat === 'daily')   nextDate.setDate(nextDate.getDate() + 1);
-  //         if (todo.repeat === 'weekly')  nextDate.setDate(nextDate.getDate() + 7);
-  //         if (todo.repeat === 'monthly') nextDate.setMonth(nextDate.getMonth() + 1);
-  //         newTodos.push({ ...todo, id: crypto.randomUUID(), completed: false, status: 'todo', completedAt: null, dueDate: nextDate.toISOString().slice(0, 16) });
-  //       }
-  //     }
-  //     if (isBecomingComplete) pushHistory('completed', todo);
-  //     return newTodos;
-  //   });
-  // };
-
+ 
   const updateTaskStatus = (id, newStatus) => {
   setTodos(prev => {
     const todo = prev.find(t => t.id === id);

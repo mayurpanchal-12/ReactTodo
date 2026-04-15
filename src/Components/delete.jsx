@@ -8,7 +8,7 @@ export default function DeleteAccountButton() {
 
   const handleDelete = async () => {
     if (!confirmed) {
-      setConfirmed(true); // first click = show confirmation
+      setConfirmed(true); 
       return;
     }
 

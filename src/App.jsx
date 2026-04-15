@@ -84,7 +84,6 @@ function TodoList() {
 
   const [installPrompt, setInstallPrompt] = useState(null);
   useEffect(() => {
-    // Event may have already fired before React mounted — grab it if so
     if (window.__installPromptEvent) {
       setInstallPrompt(window.__installPromptEvent);
       window.__installPromptEvent = null;
