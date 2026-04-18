@@ -4,6 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   sendPasswordResetEmail,
+    sendEmailVerification,        
+
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
 
@@ -30,7 +32,8 @@ export default function LoginPage() {
       case 'auth/invalid-credential':    return 'Invalid email or password. Please try again.';
       case 'auth/too-many-requests':     return 'Too many failed attempts. Please try again later.';
       case 'auth/network-request-failed':return 'Network error. Please check your connection.';
-      default:                           return 'Something went wrong. Please try again.';
+      case 'auth/email-not-verified': return 'Please verify your email first.';
+default: return 'Something went wrong. Please try again.';
     }
   };
 
@@ -43,10 +46,20 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (isRegister) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  await sendEmailVerification(result.user);
+  await auth.signOut();           // block entry until verified
+ setSuccess('Account created! A verification email has been sent. Check your inbox and spam/junk folder before logging in.');
+
+  setIsRegister(false);           // switch back to login view
+} else {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  if (!result.user.emailVerified) {
+    await auth.signOut();         // kick them out immediately
+    setError('Please verify your email before logging in. Check your inbox and spam/junk folder.');
+    return;
+  }
+}
     } catch (err) {
       setError(getFirebaseError(err.code));
     } finally {

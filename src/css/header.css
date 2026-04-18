@@ -1,35 +1,40 @@
-/* ─── Top Bar ─────────────────────────── */
+/* ============================================
+   TASKFLOW TOPBAR — Wrap into rows, nothing hidden
+   
+   Desktop  (1024px+): 1 row — all items inline
+   Tablet   (768px):   2 rows — tabs go full width below
+   Phone    (580px):   3 rows — actions also wrap below
+   Sm Phone (420px):   4 rows — hamburger+logo centered,
+                                title full width below,
+                                then tabs, then actions
+   ============================================ */
 
-.topbar,
-.topbar-title,
-.header-actions,
-.view-tabs {
-  min-width: 0;
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* UX: Sticky topbar stays in view — user always knows where they are */
+
+/* ── Topbar wrapper ─────────────────────────── */
 .topbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   position: sticky;
   top: 0;
   z-index: 20;
-  height: var(--topbar-h);
-  padding: 0 1.75rem;
+  padding: 0.625rem 1.75rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: background-color 0.3s, border-color 0.3s;
+  transition: background 0.3s, border-color 0.3s;
+  animation: fadeInDown 0.5s ease-out both;
 }
 
-/* UX: Dark mode topbar */
-.dark .topbar {
-  background: var(--bg-surface);
-}
 
-/* UX: Hamburger */
+/* ── Hamburger ──────────────────────────────── */
 .sidebar-toggle-btn {
   display: flex;
   align-items: center;
@@ -42,7 +47,9 @@
   border: 1px solid var(--border);
   cursor: pointer;
   color: var(--text-secondary);
-  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+  transition: border-color var(--transition-fast),
+              color var(--transition-fast),
+              background var(--transition-fast);
 }
 .sidebar-toggle-btn:hover {
   border-color: var(--accent);
@@ -50,18 +57,19 @@
   background: var(--accent-soft);
 }
 
-/* Logo */
+
+/* ── Logo ───────────────────────────────────── */
 .topbar-logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-right: 0.25rem;
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.04em;
   color: var(--text-primary);
   user-select: none;
+  flex-shrink: 0;
 }
 
 .topbar-logo-dot {
@@ -73,24 +81,26 @@
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
-/* Title */
+
+/* ── Title ──────────────────────────────────── */
 .topbar-title {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  overflow: visible;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .page-title {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--text-primary);
-  line-height: 1.25;
-  
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .topbar-project-badge {
@@ -104,43 +114,149 @@
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
-  animation: fadeIn 0.2s ease;
 }
 
-/* Actions */
+
+/* ── View tabs ──────────────────────────────── */
+.view-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.view-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.775rem;
+  font-weight: 600;
+  white-space: nowrap;
+  min-height: 34px;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast);
+}
+.view-tab:hover  { background: var(--bg-surface-2); color: var(--text-primary); }
+.view-tab.active { border-color: var(--accent); color: var(--accent); }
+
+
+/* ── Header actions ─────────────────────────── */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
   flex-shrink: 0;
-  flex-wrap: wrap;
 }
 
-/* Action Buttons */
 .action-btn {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  border: 1px solid;
+  border: 1px solid var(--border);
   cursor: pointer;
   padding: 0.375rem 0.75rem;
   border-radius: var(--radius-sm);
   font-size: 0.775rem;
   font-weight: 600;
-  transition: all var(--transition-fast);
   background: transparent;
   white-space: nowrap;
   min-height: 34px;
-  flex-shrink: 1;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
 }
-.action-btn.danger { border-color: var(--border); color: var(--text-secondary); }
-.action-btn.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
-.action-btn.primary { border-color: var(--border); color: var(--text-secondary); }
+.action-btn.danger:hover  { border-color: var(--red);    color: var(--red);    background: var(--red-soft); }
 .action-btn.primary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 .action-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-/* ─── Quick stats bar ─────────────────── */
+
+/* ── Responsive ─────────────────────────────── */
+
+/* 1024px: tighten padding only, still 1 row */
+@media (max-width: 1024px) {
+  .topbar { padding: 0.5rem 1.25rem; }
+}
+
+/* 768px: tabs wrap to their own full-width row (row 2) */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0.5rem 1rem;
+    gap: 0.4rem;
+  }
+
+  .view-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* 580px: actions wrap to their own full-width row (row 3) */
+@media (max-width: 580px) {
+  .topbar { padding: 0.5rem 0.875rem; }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* 420px: hamburger + logo centered on row 1
+          title full width on row 2
+          tabs full width on row 3
+          actions full width on row 4           */
+@media (max-width: 420px) {
+  .topbar {
+    padding: 0.5rem 0.75rem;
+    gap: 0.35rem;
+    justify-content: center;        /* centers the hamburger + logo row */
+  }
+
+  .sidebar-toggle-btn { flex-shrink: 0; }
+
+  .topbar-title {
+    width: 100%;                    /* own row, full width */
+    min-width: 0;
+    justify-content: center;        /* title text centered */
+  }
+
+  .page-title {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .topbar-project-badge {
+    justify-content: center;
+  }
+
+  .view-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-tab {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;        /* actions centered too */
+  }
+}
+
+   /* ─── Quick stats bar ─────────────────── */
 
 .quickstats {
   display: flex;
@@ -149,20 +265,14 @@
   padding: 0.6rem 1.75rem;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-surface);
-  overflow-x: auto;
   flex-shrink: 0;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
-.quickstats::-webkit-scrollbar { display: none; }
 
 .quickstat-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
-  scroll-snap-align: start;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
@@ -187,10 +297,7 @@
 .quickstat-item.green  .quickstat-icon { background: var(--green-soft); }
 .quickstat-item.red    .quickstat-icon { background: var(--red-soft); }
 
-.quickstat-icon svg {
-  width: 15px;
-  height: 15px;
-}
+.quickstat-icon svg { width: 15px; height: 15px; }
 .quickstat-item.accent .quickstat-icon svg { stroke: var(--accent); }
 .quickstat-item.indigo .quickstat-icon svg { stroke: var(--indigo); }
 .quickstat-item.green  .quickstat-icon svg { stroke: var(--green); }
@@ -264,15 +371,73 @@
   white-space: nowrap;
 }
 
-/* ─── Filter pills ───────────────────── */
+
+/* ── Responsive ─────────────────────────────── */
+
+/* 1024px: tighten padding only */
+@media (max-width: 1024px) {
+  .quickstats { padding: 0.5rem 1.25rem; }
+}
+
+/* 768px: tighter padding and gaps */
+@media (max-width: 768px) {
+  .quickstats     { padding: 0.5rem 1rem; gap: 0.35rem; }
+  .quickstat-item { padding: 0.4rem 0.75rem; gap: 0.6rem; }
+  .progress-bar-wrap { min-width: 140px; }
+}
+
+/* 580px: progress bar drops to its own full-width row */
+@media (max-width: 580px) {
+  .quickstats { padding: 0.5rem 0.875rem; flex-wrap: wrap; }
+
+  .progress-bar-wrap {
+    width: 100%;
+    margin-left: 0;
+    min-width: 0;
+  }
+}
+
+/* 420px: 2x2 grid — all 4 stats visible, nothing hidden, nothing scrolls */
+@media (max-width: 420px) {
+  .quickstats {
+    padding: 0.5rem 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;   /* 2 equal columns */
+    gap: 0.35rem;
+  }
+
+  /* separators make no sense in a grid */
+  .quickstat-sep { display: none; }
+
+  .quickstat-item {
+    flex-shrink: unset;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-subtle);  /* visible card feel in grid */
+    background: var(--bg-surface-2);
+  }
+
+  /* progress bar spans both columns — full width below grid */
+  .progress-bar-wrap {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-left: 0;
+    min-width: 0;
+  }
+}
+
+/* buttons */
+
+
+/* ─── Filter Pills ───────────────────────────── */
 
 .stats-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: wrap;                  /* pills naturally wrap to next line */
   margin-bottom: 1rem;
 }
+
 .stats-pill {
   display: flex;
   align-items: center;
@@ -287,8 +452,13 @@
   color: var(--text-secondary);
   transition: all var(--transition-fast);
   min-height: 32px;
+  white-space: nowrap;
 }
-.stats-pill:hover { border-color: var(--text-secondary); color: var(--text-primary); background: var(--bg-surface-2); }
+.stats-pill:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+}
 
 .pill-count {
   font-family: var(--font-mono);
@@ -300,11 +470,12 @@
 
 .pill-active           { border-color: var(--accent);  color: var(--accent);  background: var(--accent-soft); }
 .pill-active-active    { border-color: var(--indigo);  color: var(--indigo);  background: var(--indigo-soft); }
-.pill-active-completed { border-color: var(--green);   color: var(--green);   background: var(--green-soft); }
-.pill-active-overdue   { border-color: var(--red);     color: var(--red);     background: var(--red-soft); }
+.pill-active-completed { border-color: var(--green);   color: var(--green);   background: var(--green-soft);  }
+.pill-active-overdue   { border-color: var(--red);     color: var(--red);     background: var(--red-soft);    }
 .pill-active-category  { border-color: var(--purple);  color: var(--purple);  background: var(--purple-soft); }
 
-/* Dropdown */
+
+/* ─── Category Dropdown ──────────────────────── */
 
 .cat-dropdown {
   position: absolute;
@@ -330,143 +501,35 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   min-height: 36px;
+  transition: background var(--transition-fast);
 }
+.cat-option:hover { background: var(--bg-surface-2); }
 
-/* ─── View Tabs ─────────────────────── */
 
-.view-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
+/* ── Responsive ─────────────────────────────── */
 
-.view-tab {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0.775rem;
-  font-weight: 600;
-  white-space: nowrap;
-  min-height: 34px;
-}
-.view-tab:hover {
-  background: var(--bg-surface-2);
-}
-.view-tab.active {
-  border-color: var(--accent);
-}
+/* 1024px: nothing changes, already comfortable */
 
-/* ─── Responsive ─────────────────────── */
-
-/* 1024px — laptop */
-@media (max-width: 1024px) {
-  .topbar {
-    padding: 0 1.25rem;
-    gap: 0.5rem;
-  }
-}
-
-/* 768px — tablet: wrap into rows */
+/* 768px: tighten gap and bottom margin */
 @media (max-width: 768px) {
-  .topbar {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 0.5rem 1rem;
-    gap: 0.4rem;
-  }
-
-  /* Row 1: hamburger + logo + actions */
-  .sidebar-toggle-btn { order: 1; flex-shrink: 0; }
-  .topbar-logo        { order: 2; display: flex;  }
-  .header-actions     { order: 3; margin-left: auto; flex-shrink: 0; }
-
-  /* Row 2: view tabs — full width, evenly spread */
-  .view-tabs {
-    order: 4;
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.25rem;
-    background: transparent;
-    border: none;
-    padding: 0;
-  }
-  .view-tab {
-    flex: 1;
-    justify-content: center;
-    font-size: 0.72rem;
-    padding: 0.35rem 0.25rem;
-  }
-
-  /* Row 3: title — full width */
-  .topbar-title {
-    order: 5;
-    width: 100%;
-    min-width: 0;
-    overflow: visible;
-  }
-  .topbar-project-badge { display: inline-flex; }
-
-  .page-title {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    font-size: 1rem;
-  }
+  .stats-row  { gap: 0.375rem; margin-bottom: 0.75rem; }
 }
 
-/* 640px — large phones */
-@media (max-width: 640px) {
-  .topbar {
-    padding: 0.5rem 0.75rem;
-    gap: 0.35rem;
-  }
-  .view-tab {
-    font-size: 0.68rem;
-    padding: 0.3rem 0.2rem;
-  }
-  .quickstats {
-    padding: 0.5rem 0.75rem;
-  }
+/* 580px: pills slightly smaller, wrap naturally handles the rest */
+@media (max-width: 580px) {
+  .stats-row  { gap: 0.3rem; margin-bottom: 0.65rem; }
+  .stats-pill { padding: 0.3rem 0.6rem; font-size: 0.725rem; min-height: 30px; }
+  .pill-count { font-size: 0.62rem; }
 }
 
-/* 480px — phones */
-@media (max-width: 480px) {
-  .topbar {
-    padding: 0.5rem 0.625rem;
-  }
-  .action-btn {
+/* 420px: pills fill row in pairs — 2 per row naturally via flex-wrap */
+@media (max-width: 420px) {
+  .stats-row  { gap: 0.25rem; margin-bottom: 0.5rem; }
+  .stats-pill { 
     padding: 0.3rem 0.5rem;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     min-height: 30px;
-  }
-  .quickstats {
-    padding: 0.5rem 0.625rem;
-  }
-  .progress-bar-wrap {
-    min-width: 100px;
-  }
-  .page-title {
-    font-size: 0.9rem;
-  }
-}
-
-/* 360px — very small phones */
-@media (max-width: 360px) {
-  .topbar {
-    padding: 0.5rem 0.5rem;
-  }
-  .sidebar-toggle-btn {
-    width: 30px;
-    height: 30px;
-  }
-  .view-tab {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.15rem;
+    flex: 1;                        /* pills stretch to fill row evenly */
+    justify-content: center;
   }
 }

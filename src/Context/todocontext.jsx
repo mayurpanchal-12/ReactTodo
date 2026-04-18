@@ -129,12 +129,21 @@ useEffect(() => {
 
 const addTodo = (todoData) => {
   const newTodo = {
-    id: Date.now(), priority: 'mid', category: 'other',
-    attachments: [], subtasks: [], repeat: 'none',
-    completedAt: null, description: '', status: 'todo',  // ← add this
-    projectId: activeProject || null, tags: [],
+    id: Date.now(),
+    priority: 'mid',
+    category: 'other',
+    attachments: [],
+    subtasks: [],
+    repeat: 'none',
+    completedAt: null,
+    description: '',
+    status: 'todo',
+    projectId: activeProject || null,
+    tags: [],
     ...todoData,
-  };}
+  };
+  setTodos(prev => [...prev, newTodo]);  
+};
   const updateTodo = (id, updates) => {
     const original = todosRef.current.find(t => t.id === id);
     setTodos(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
@@ -151,12 +160,16 @@ const addTodo = (todoData) => {
  
   const updateTaskStatus = (id, newStatus) => {
   setTodos(prev => {
-    const todo = prev.find(t => t.id === id);
+    // const todo = prev.find(t => t.id === id);
+    const todo = prev.find(t => String(t.id) === String(id));
+
     if (!todo) return prev;
     const currentStatus = todo.status || (todo.completed ? 'completed' : 'todo');
     if (currentStatus === newStatus) return prev;
     const isBecomingComplete = newStatus === 'completed';
-    let newTodos = prev.map(t => t.id === id ? {
+    // let newTodos = prev.map(t => t.id === id ? {
+    let newTodos = prev.map(t => String(t.id) === String(id) ? {
+
       ...t, status: newStatus,
       completed: isBecomingComplete,
       completedAt: isBecomingComplete ? new Date().toISOString() : null,

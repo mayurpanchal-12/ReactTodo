@@ -6,13 +6,21 @@ export default function BoardView() {
   const { todos, filter, categoryFilter, searchQuery, updateTaskStatus } = useTodo();
   const [dragOverCol, setDragOverCol] = useState(null);
 
-  const handleDragStart = (e, id) => { e.dataTransfer.setData("taskId", id); };
+  // const handleDragStart = (e, id) => { e.dataTransfer.setData("taskId", id); };
+  const handleDragStart = (e, id) => { e.dataTransfer.setData("taskId", String(id)); };
+
   const handleDragOver  = (e, colId) => { e.preventDefault(); setDragOverCol(colId); };
-  const handleDragLeave = () => setDragOverCol(null);
+  // const handleDragLeave = () => setDragOverCol(null);
+  const handleDragLeave = (e) => {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    setDragOverCol(null);
+  }
+};
   const handleDrop      = (e, newStatus) => {
     e.preventDefault();
-    const taskId = Number(e.dataTransfer.getData("taskId"));
-    if (taskId) updateTaskStatus(taskId, newStatus);
+    
+    const taskId = e.dataTransfer.getData("taskId");
+if (taskId) updateTaskStatus(taskId, newStatus);
     setDragOverCol(null);
   };
 
