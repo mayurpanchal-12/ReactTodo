@@ -1,213 +1,365 @@
-# TaskFlow — Cloud Task Manager
+# TaskFlow — Task Management App
 
 ![React](https://img.shields.io/badge/React-18-blue?logo=react)
+![Vite](https://img.shields.io/badge/Vite-Fast-green?logo=vite)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-orange?logo=firebase)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-File%20Storage-3448C5?logo=cloudinary)
-![Vite](https://img.shields.io/badge/Vite-Fast%20Build-green?logo=vite)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-File%20Storage-blue?logo=cloudinary)
+![PWA](https://img.shields.io/badge/PWA-Enabled-purple?logo=googlechrome)
 ![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
 
 ---
 
-A **production-grade cloud task management Responsive SPA** built with React 18, Firebase Auth, Firestore, and Cloudinary. Every piece of your data lives in the cloud — open the app on two devices and watch changes appear instantly in real time.
+A production-grade **Task Management SPA** built with **React** and **Context API**, applying real-world engineering practices: scalable **state management**, **real-time Firestore sync**, **code splitting**, and **Progressive Web App (PWA)** support for offline use.
+
+The app integrates **Firebase Authentication** for secure login, **Firestore** for per-user persistent storage, and **Cloudinary** for file attachments. Core features include a **Kanban board** with drag-and-drop, a **monthly calendar view**, **per-task Pomodoro timer**, **repeating tasks**, **project workspaces**, **tag-based filtering**, and an **analytics dashboard** with activity heatmap.
+
+user can create seprate project for specific Todos
 
 ---
-
 ## 🔗 Live Demo
 
 [View the live app on Vercel](https://react-todo-sage-phi.vercel.app/)
 
-## 🔗 GitHub Repository
+## 🔗 Git Repo
 
-[View source on GitHub](https://github.com/mayurpanchal-12/ReactTodo.git)
-
----
-
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| UI | React 18, CSS Custom Properties, Tailwind Css , Vite |
-| Auth | Firebase Authentication (Google + Email/Password) |
-| Database | Cloud Firestore (real-time sync) |
-| File Storage | Cloudinary (direct browser uploads) |
-| Deployment | Vercel deployment|
-| Export | jsPDF (dynamic import), native CSV |
-| Voice | Web Speech API |
-| Drag & Drop | Native HTML5 Drag and Drop API |
-|PWA | install via PWA funtionality
+[View source code on GitHub](https://github.com/mayurpanchal-12/ReactTodo.git)
 
 ---
 
-## ✨ Full Feature List
+## 🚀 Application Flow
 
-### 🔐 Auth & Account
-- Google OAuth sign-in and email/password login on the same screen
-- New account registration with password confirmation
-- Forgot password — reset link sent via Firebase email
-- Delete account — automatically re-authenticates via Google popup if the session is stale, then deletes cleanly
-- All data is isolated per user — Firestore security rules enforce this server-side, not just in the UI
+```
+Open App → Firebase checks auth state
+        ↓
+Not logged in → LoginPage (Google OAuth or Email/Password)
+        ↓
+Logged in → Firestore loads user data via real-time onSnapshot listener
+        ↓
+Skeleton placeholders shown while data loads
+        ↓
+View All Tasks (List view — grouped by due date, sorted by priority)
+        ↓
+Add Task → set title, due date + time, priority, category, project, tags,
+           description, subtasks, repeat, attachments (Cloudinary), pin
+        ↓
+Voice input via mic → Web Speech API fills task name hands-free
+        ↓
+Task cards → edit inline, complete, pin, tag, attach files, start Pomodoro
+        ↓
+Pomodoro Timer → 25min work / 5min break cycles, linked to specific task
+        ↓
+Repeating task completed → auto-clones with next due date ✅
+        ↓
+Switch to Board view → drag and drop between To Do / In Progress / Done
+        ↓
+Switch to Calendar view → browse tasks by due date on monthly grid
+        ↓
+Switch to History view → activity log (created / edited / completed / deleted)
+        ↓
+Filter by status → All / Active / Done / Overdue
+        ↓
+Filter by category → Finance / Study / Work / Other
+        ↓
+Filter by tag → click tag chip in sidebar to isolate tasks
+        ↓
+Today's Focus → shows only today's tasks + all overdue active tasks
+        ↓
+Pinned panel → quick-access pinned tasks, click to scroll + flash highlight
+        ↓
+Projects panel → create color-labeled workspaces, scope all views per project
+        ↓
+Analytics Dashboard → completion rate, category breakdown, 28-day heatmap
+        ↓
+Export filtered tasks → CSV or PDF via Export dropdown
+        ↓
+Install as PWA → Add to device from quick-stats bar
+        ↓
+Toggle dark / light mode → persisted to Firestore per user
+        ↓
+Delete account → re-authenticates via Google popup, then deletes Firebase user
+```
 
-### ✅ Task Creation
-- Task name with voice input (Web Speech API — click mic, speak, done)
-- Due date + time picker
-- Priority — 🔴 High / 🟡 Medium / 🟢 Low
-- Category — 💰 Finance / 📚 Study / 💼 Work / 📝 Other
-- Repeat — None / Daily / Weekly / Monthly (auto-clones task on completion with next due date)
-- Assign to a project directly from the form
-- Pin a task directly from the form
-- Add #tags directly from the form
-- Add subtasks (nested checklist) directly from the form
-- Add markdown notes (bold, italic, code) directly from the form
-- Attach images (max 2MB) or files (max 5MB), up to 5 per task — uploaded to Cloudinary
+---
 
-### 📋 List View
-- Tasks grouped by due date — Today, Tomorrow, or weekday label
-- Within each group, sorted High → Medium → Low priority automatically
-- Overdue tasks get a red accent and overdue badge
-- Skeleton loading cards shown while Firestore data loads after login
-- Empty state message when no tasks match the active filter
+## 🛡️ Error Handling
 
-### 🗃️ Board View (Kanban)
-- Three columns — **To Do / In Progress / Done**
-- Drag and drop tasks between columns using the native browser Drag and Drop API (no external library)
-- Dropping a card updates its status in Firestore in real time
-- Columns respect the active search, category, and status filters
+```
+Any component throws a JS error
+        ↓
+ErrorBoundary catches it → getDerivedStateFromError fires
+        ↓
+"Something went wrong" screen shown
+        ↓
+Two options: Try Again (resets state) or Reload Page ✅
 
-### 🗓️ Calendar View
-- Full month calendar with prev/next month navigation and a Today button
-- Each date cell shows tasks due on that day as colored dots
-- Tasks respect the active search and category filter
-- Click a date cell to see its tasks inline
 
-### 📊 Analytics Dashboard
-- **Completion rate** — radial SVG ring showing percentage of all tasks completed
-- **GitHub-style heatmap** — 28-day grid of task completions, intensity-coded by count
-- **Best day** — shows which day in the last 28 had the most completions
-- **Category breakdown** — horizontal bar chart for Finance / Study / Work / Other
-- **Status overview** — Total / Active / Completed / Overdue counts
+No tasks match active filters
+        ↓
+Empty state shown → contextual message based on view / project / filter ✅
 
-### 🕐 Activity History
-- Chronological log of every create, edit, complete, and delete event
-- Each entry shows the task name, category icon, priority icon, and a relative timestamp (e.g. "2h ago")
-- Filter history by action type — All / Created / Edited / Completed / Deleted
-- Clear history button with confirmation
-- Capped at 300 entries — oldest entries drop off automatically
 
-### 📁 Projects
-- Create projects with a name and one of 10 color labels
-- Rename a project inline — click the edit icon, type, press Enter
-- Delete a project — tasks are unassigned (not deleted), confirmed with a prompt
-- Each project shows a live task count and a color-coded progress bar (% completed)
-- Click a project in the sidebar to filter all views to that project only
-- Assign tasks to projects from the task form or task edit panel
+File attachment upload fails
+        ↓
+Cloudinary error caught → task saved without attachment ✅
+
+
+Account delete requires recent login
+        ↓
+auth/requires-recent-login caught → re-auth popup triggered automatically ✅
+
+
+Export clicked with no visible tasks
+        ↓
+Alert shown before CSV / PDF generation attempted ✅
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Core
+| Technology | Usage |
+|-----------|-------|
+| React 18 | Hooks, Context, class-based ErrorBoundary |
+| Context API + useState | Single `TodoContext` — no Redux needed |
+| Vite | Fast dev server, `import.meta.env` for secure keys, PWA plugin |
+| Custom CSS + CSS Variables | Full design system with light/dark token remapping |
+
+### Backend & Storage
+| Service | Usage |
+|---------|-------|
+| Firebase Auth | Google OAuth + Email/Password login, account deletion with re-auth |
+| Firestore | Real-time `onSnapshot` listener, debounced writes (600ms), per-user doc |
+| Firebase Analytics | Usage tracking (safe-init — no crash if measurementId missing) |
+| Cloudinary | File and image upload per task, unsigned preset, no backend needed |
+
+### Libraries & APIs
+| Library / API | Usage |
+|--------------|-------|
+| Web Speech API | Voice-to-text task input via browser's `SpeechRecognition` |
+| jsPDF | PDF export of filtered task list |
+| `virtual:pwa-register` | Service worker registration for offline PWA support |
+
+---
+
+## ✨ Features
+
+### 🔐 Authentication
+- Google OAuth and Email/Password login via Firebase Auth
+- `select_account` prompt on Google sign-in — always shows account picker
+- Account deletion with automatic re-authentication if session is stale
+- Per-user data isolation — all data scoped to `users/{uid}` in Firestore
+
+### ✅ Task Management
+- Add tasks with: title, due date + time, priority (High / Mid / Low), category, project, tags, description, subtasks, repeat schedule, file attachments, and pin
+- Inline editing on every task card — edit and save without a separate page
+- Three-state status: `todo` → `in_progress` → `completed`
+- `toggleComplete` and `updateTaskStatus` are separate — board drag-and-drop uses status, checkbox uses toggle
+- Tasks grouped by due date in list view, sorted by priority within each group
+- Today and Tomorrow date groups labelled contextually
+
+### 📋 Subtasks
+- Add multiple subtasks to any task
+- Subtask completion tracked independently
+- Subtask progress visible on the task card
+
+### 🔁 Repeating Tasks
+- Repeat options: Daily / Weekly / Monthly / None
+- On completion, a new task is auto-cloned with the next due date calculated
+- Original task marked complete, clone pushed to the list immediately
 
 ### 📌 Pinned Tasks
-- Pin any task from the form or from the task card
-- All pinned tasks appear in the sidebar panel for quick access
-- Click a pinned task in the sidebar to jump straight to it
+- Pin any task for quick sidebar access
+- Click a pinned item → navigates to list view, scrolls to the task, flashes a highlight
+- Pins persisted to Firestore
 
 ### 🏷️ Tags
-- Add multiple #tags to any task
-- All unique tags appear in the sidebar Tags panel
-- Click a tag to filter the list view to only tasks with that tag
-- Tags are stored lowercase and deduplicated automatically
+- Add any number of custom tags to a task
+- Tags panel in sidebar lists all unique tags across all tasks
+- Tag color derived deterministically from tag name (consistent across sessions)
+- Click any tag to filter the full task list to that tag
+- Tag count shown per chip
 
-### 🎯 Today Focus Mode
-- One click in the sidebar to show only tasks due today plus any overdue incomplete tasks
-- Works across List, Board, and Calendar views
+### 📁 Projects
+- Create color-labeled project workspaces (10 accent colors available)
+- Rename and delete projects — deleting a project unassigns but does not delete its tasks
+- All views (list, board, calendar, history) scope to the active project
+- Quick-stats bar shows project completion percentage when a project is active
+
+### 📊 Analytics Dashboard
+- Overall completion rate with progress indicator
+- Active / Completed / Overdue counts
+- Category breakdown with relative bar lengths (Finance, Study, Work, Other)
+- 28-day activity heatmap — cells colored by completion intensity (4 levels)
+- Best day highlight — the day with most completions in the last 28 days
+
+### 🗃️ Kanban Board
+- Three columns: To Do / In Progress / Done
+- Full drag-and-drop between columns via HTML5 Drag API
+- `dataTransfer.setData` / `getData` — no library dependency
+- Dropping a card calls `updateTaskStatus` which handles repeat-clone logic
+
+### 📅 Calendar View
+- Full monthly grid with prev / next / today navigation
+- Tasks appear on their due date cells
+- Up to 3 tasks shown per day, overflow count displayed
+- Respects active status, category, and search filters
+
+### 🕐 Activity History
+- Log of all create / edit / complete / delete actions (up to 300 entries)
+- Each entry shows: task name, category icon, priority icon, time-ago label, formatted timestamp
+- Filter history by action type
+- Clear all history button
 
 ### ⏱️ Pomodoro Timer
-- Attach a focus timer to any task from the task card
-- 25-minute work session → 5-minute break, cycles automatically
-- Shows the active task name in the timer widget
-- Collapses to a bottom sheet on mobile screens
+- Floating widget — appears when a task has an active Pomodoro session
+- 25-minute work / 5-minute break automatic cycle
+- Circular SVG progress ring updates in real time
+- Task name shown inside the timer
+- Reset and close controls
+
+### 🎙️ Voice Input
+- Mic button on the task form
+- Uses `webkitSpeechRecognition` / `SpeechRecognition` with `continuous: true`
+- Transcript appended to the task title field in real time
+
+### 📎 File Attachments
+- Attach images (max 2MB) and files (max 5MB) per task — up to 5 attachments
+- Images uploaded to Cloudinary — URL and metadata stored in Firestore
+- Image thumbnails shown inline on the task card
+- File attachments shown with filename and icon
+- Click to open in new tab
+
+### 📅 Today's Focus
+- Sidebar shortcut that filters to: today's tasks + all overdue active tasks
+- Count badge shows urgency (red when > 0)
+- Resets all other active filters when enabled
 
 ### 🔍 Search & Filter
-- Debounced search bar — filters task name matches across all visible tasks
-- Status filter pills — All / Active / Completed / Overdue
-- Category dropdown filter — Finance / Study / Work / Other
-- All filters combine — search + status + category + project + tag all work together
+- Live search across task titles (`searchInput` updates instantly, `searchQuery` used in filtering)
+- Status filter pills: All / Active / Done / Overdue
+- Category dropdown filter: Finance / Study / Work / Other
+- Tag filter from sidebar Tags panel
+- Today's Focus mode
+- Project scope from sidebar Projects panel
+- All filters composable — project + tag + status can be active simultaneously
+- Export disabled when category filter is active
 
-### 📤 Export
-- **CSV** — exports all currently visible (filtered) tasks with name, due date, priority, category, completion status
-- **PDF** — landscape table with header row, data rows, and a summary (total / completed / active) at the bottom
-- PDF library (jsPDF) is loaded dynamically on demand — not included in the initial bundle
-- Export is blocked when a category filter is active (to prevent partial data confusion)
+### 💾 Export
+- Export **filtered** task list as CSV or PDF
+- CSV includes: task name, status, priority, category, due date, tags, project
+- PDF rendered via jsPDF in landscape layout
+- Export button disabled when category filter is active
 
-### 🌙 Dark / Light Mode
-- Full dark mode — all CSS tokens remapped, not just inverted colors
-- Theme preference saved to the user's Firestore document — persists across devices and sessions
-- Toggle from the user menu in the sidebar footer
+### 🎨 Theme System
+- Light mode and Dark mode
+- Full CSS variable token remapping — not just a color inversion
+- Theme toggled from the `UserPill` dropdown in the sidebar footer
+- Theme persisted to Firestore — syncs across devices
 
-### ♿ Accessibility
-- Skip navigation link for keyboard users (WCAG 2.4.1)
-- Visible focus ring on every interactive element via `:focus-visible` (WCAG 2.4.7)
-- Minimum 44px touch targets (WCAG 2.5.5)
-- Color never used alone to convey meaning — always paired with icon or text (WCAG 1.4.1)
-- `prefers-reduced-motion` disables all animations (WCAG 2.3.3)
-- `aria-label`, `aria-pressed`, `aria-selected`, `aria-live`, `role` used throughout (WCAG 4.1.2)
-- High contrast mode support via `forced-colors: active`
+### 📲 Progressive Web App (PWA)
+- Service worker registered via `vite-plugin-pwa` on app load (`main.jsx`)
+- `beforeinstallprompt` captured globally, stored on `window.__installPromptEvent`
+- Install button appears in the quick-stats bar when prompt is available
+- Clicking Install calls `deferredPrompt.prompt()` — browser handles the dialog
+- Button hides itself on `appinstalled` event
 
-### PWA 
- - Supports installation using Progressive Web App (PWA) capabilities
-
-### Responsive 
-  - responsive to all major screen sizeses
 ---
 
-## ⚙️ Key Engineering Decisions
+## 🧠 State Management
+
+```
+TodoContext (single context for all task state)
+├── todos              — full task array
+├── filteredTodos      — derived from todos + all active filters
+├── groupedTodos       — filteredTodos grouped by due date, sorted by priority
+├── filter             — status filter (all / active / completed / overdue)
+├── searchInput        — raw input value (immediate UI update)
+├── searchQuery        — debounced string used in actual filtering
+├── categoryFilter     — active category or null
+├── activeProject      — active project id or null
+├── activeTag          — active tag string or null
+├── todayFocus         — boolean focus mode
+├── pinnedIds          — array of pinned task ids
+├── projects           — project objects with id, name, color
+├── history            — activity log (max 300 entries)
+├── theme              — 'light' | 'dark'
+├── activePomodoroId   — task id with active Pomodoro or null
+└── loaded             — true once Firestore snapshot has arrived
+
+AuthContext
+├── user               — Firebase user object or null (undefined = loading)
+├── logout             — signs out via Firebase
+├── deleteAccount      — deletes user, re-auths automatically if needed
+└── isDeleting         — boolean loading state for account deletion
+```
+
+**Firestore sync strategy:**
+- On login: `onSnapshot` on `users/{uid}` — real-time listener, fires immediately with cached data
+- `skipNextSave` ref prevents write-effect from firing right after a snapshot read — avoids unnecessary round-trips
+- On change: debounced `setDoc` with `{ merge: true }` — 600ms delay batches rapid changes into a single write
+
+---
+
+## ⚙️ Engineering Decisions
 
 | Decision | Reason |
-|---|---|
-| Firestore over localStorage | Real-time sync across devices, survives browser clears, no data loss |
-| Cloudinary for file attachments | Firestore has a 1MB per-document limit — storing images as base64 inline would silently corrupt user data |
-| `onSnapshot` for reads | Live updates with no polling — changes on one device appear instantly on all others |
-| Debounced Firestore writes (600ms) | Rapid state changes (e.g. typing) get batched into one write — avoids rate limits and unnecessary cost |
-| `skipNextSave` ref flag | Prevents the `onSnapshot` callback from immediately triggering a write back to Firestore (write-on-read bug) |
-| `TodoProvider` inside `AppContent` | Firestore subscription only initializes after a confirmed authenticated user exists — no wasted reads |
-| `crypto.randomUUID()` for all IDs | Guaranteed collision-free — `Date.now()` IDs can clash when React batches state updates in the same millisecond |
-| Re-auth before account delete | Firebase requires a fresh session for destructive operations — handled automatically via Google popup, no manual logout needed |
-| Dynamic jsPDF import | ~500KB PDF library only loads when the user actually clicks export, keeping the initial bundle lean |
-| Native HTML5 Drag and Drop | Full Kanban functionality with zero external drag-and-drop dependencies |
-| Error Boundary with reset button | Catches render crashes, offers in-place "Try again" recovery without forcing a full page reload |
-|About  | complete information of application
+|----------|--------|
+| Single `TodoContext` (not split) | All task state is tightly coupled — splitting would require cross-context access everywhere |
+| `skipNextSave` ref pattern | Prevents snapshot → state update → write → snapshot infinite loop in Firestore listener |
+| Debounced Firestore write (600ms) | Rapid toggles / edits batch into one write instead of firing on every state change |
+| `searchInput` + `searchQuery` split | Input updates instantly for UI responsiveness; filter applies on a short delay |
+| `todosRef` synced via effect | Gives `deleteTodo` / `clearCompleted` access to latest todos without stale closure |
+| HTML5 Drag API for Kanban | No library dependency — sufficient for a 3-column board |
+| `updateTaskStatus` separate from `toggleComplete` | Board drag sets arbitrary status; checkbox toggle needs repeat-clone logic — kept separate |
+| `pushHistory` called inside state updaters | History entry reflects actual mutation, not a stale snapshot |
+| Cloudinary unsigned preset | File upload with zero backend — URL returned directly from Cloudinary API |
+| `select_account` on Google provider | Forces account picker even if user is already signed in |
+| ErrorBoundary with two recovery options | "Try Again" resets boundary state; "Reload" hard-resets the page — covers both error types |
+
 ---
 
+## 🔒 Security
+
+- Firebase Auth — no passwords stored in app, Google handles OAuth flow
+- Firestore data scoped to `users/{uid}` — users can only access their own document
+- Re-authentication required before account deletion — prevents accidental deletion with stale session
+- All API keys in `.env` via `import.meta.env` — never hardcoded in source
+- Cloudinary upload uses unsigned preset — no secret key exposed in client
+
+---
 
 ## ▶️ Getting Started
 
 ```bash
-git clone https://github.com/mayurpanchal-12/ReactTodo.git
-cd ReactTodo
+git clone <https://github.com/mayurpanchal-12/ReactTodo.git>
+cd taskflow
 npm install
 ```
 
 Create a `.env` file in the project root:
 
 ```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-VITE_CLOUDINARY_CLOUD_NAME=
-VITE_CLOUDINARY_UPLOAD_PRESET=
+VITE_FIREBASE_API_KEY=your_key
+VITE_FIREBASE_AUTH_DOMAIN=your_domain
+VITE_FIREBASE_PROJECT_ID=your_project
+VITE_FIREBASE_STORAGE_BUCKET=your_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
 ```
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🌐 Deployment
 
-Deployed on **Vercel** — auto-builds and deploys on every push to `main`.
+## 👤 Author
 
-All `VITE_*` environment variables are set in Vercel → Project Settings → Environment Variables.
-
-Live: [https://react-todo-sage-phi.vercel.app/](https://react-todo-sage-phi.vercel.app/)
+Built by **Mayur Panchal** — React Developer
