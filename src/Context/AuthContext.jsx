@@ -13,13 +13,22 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+  //     setUser(firebaseUser ?? null);
+  //   });
+  //   return unsubscribe;
+  // }, []);
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    if (firebaseUser && !firebaseUser.emailVerified && firebaseUser.providerData[0]?.providerId === 'password') {
+      setUser(null);  // unverified email user → keep them on login page
+    } else {
       setUser(firebaseUser ?? null);
-    });
-    return unsubscribe;
-  }, []);
-
+    }
+  });
+  return unsubscribe;
+}, []);
   const logout = async () => {
     try {
       await signOut(auth);
